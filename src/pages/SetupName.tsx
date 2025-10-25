@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import logoImg from "@/assets/logo/logo.png";
 import {
   Select,
   SelectContent,
@@ -113,9 +114,9 @@ const SetupName = () => {
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <img src="/src/assets/logo/logo.png" alt="BuilderClub" className="w-full h-full object-cover" />
+                  <img src={logoImg} alt="BuilderClub" className="w-full h-full object-cover" />
                 )}
-              </div>
+              </div>  
               <label
                 htmlFor="avatar-upload"
                 className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors"
