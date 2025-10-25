@@ -31,7 +31,7 @@ const demoFriends = [
 const demoProjects: ProjectSpace[] = [
   {
     id: '1',
-    logo: '/src/assets/startup_logo/sonder.png',
+    logo: '/startup_logo/sonder.png',
     name: 'Sonder',
     initialIdea: 'AI-powered empathy platform',
     description: 'Building an AI platform that helps people understand and express emotions better through personalized insights and interactive experiences.',
@@ -50,7 +50,7 @@ const demoProjects: ProjectSpace[] = [
   },
   {
     id: '2',
-    logo: '/src/assets/startup_logo/clova.png',
+    logo: '/startup_logo/clova.png',
     name: 'Clova',
     initialIdea: 'Smart home automation for everyone',
     description: 'Democratizing smart home technology with affordable, easy-to-install devices that work seamlessly together.',
@@ -65,7 +65,7 @@ const demoProjects: ProjectSpace[] = [
   },
   {
     id: '3',
-    logo: '/src/assets/startup_logo/polymarket.png',
+    logo: '/startup_logo/polymarket.png',
     name: 'Polymarket',
     initialIdea: 'Decentralized prediction market platform',
     description: 'A prediction market platform where users can bet on real-world events using cryptocurrency, powered by blockchain technology.',
@@ -84,7 +84,7 @@ const demoProjects: ProjectSpace[] = [
   },
   {
     id: '4',
-    logo: '/src/assets/startup_logo/flora.png',
+    logo: '/startup_logo/flora.png',
     name: 'Flora',
     initialIdea: 'AI plant care assistant',
     description: 'An app that uses AI to identify plant diseases, provide personalized care tips, and connect plant lovers in a vibrant community.',
@@ -98,7 +98,7 @@ const demoProjects: ProjectSpace[] = [
   },
   {
     id: '5',
-    logo: '/src/assets/startup_logo/instinct.png',
+    logo: '/startup_logo/instinct.png',
     name: 'Instinct',
     initialIdea: 'Next-gen fitness tracker with AI coaching',
     description: 'A fitness tracker that learns your patterns and provides personalized workout recommendations powered by machine learning.',
@@ -127,13 +127,13 @@ const initialProjectState: {
   stage: ProjectStage;
   music: { image: string; name: string };
 } = {
-  logo: '/src/assets/demo/lowercase.png',
+  logo: '/demo/lowercase.png',
   name: 'Lowercase',
   initialIdea: 'an engineering-first design studio',
   description: 'an engineering-first design studio',
   stage: 'idea',
   music: {
-    image: '/src/assets/demo/music-cover.png',
+    image: '/demo/music-cover.png',
     name: 'Whop'
   }
 };

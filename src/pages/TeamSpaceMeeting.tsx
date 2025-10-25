@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ProjectInfoCard, ProjectMeetingInfo } from '@/components/ProjectInfoCard';
 import { MatchingReasonsPanel, MatchingReason, Topic } from '@/components/MatchingReasonsPanel';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, ArrowLeft } from 'lucide-react';
-import sonderLogo from '@/assets/startup_logo/sonder.png';
-import interactionLogo from '@/assets/startup_logo/interaction.png';
-import clovaLogo from '@/assets/startup_logo/clova.png';
+// Project logos now loaded from public directory
 
 const TeamSpaceMeeting = () => {
   const navigate = useNavigate();
@@ -17,21 +15,21 @@ const TeamSpaceMeeting = () => {
   const projects: ProjectMeetingInfo[] = [
     {
       name: 'Sonder',
-      logo: sonderLogo,
+      logo: '/startup_logo/sonder.png',
       description: 'AI-powered empathy platform helping people understand and express emotions better through personalized insights and interactive experiences.',
       recentIssues: 'Need to validate product-market fit with early users and refine our AI emotion detection algorithms.',
       canOffer: 'AI/ML expertise, user research insights, emotional intelligence framework, beta testing platform.'
     },
     {
       name: 'Interaction',
-      logo: interactionLogo,
+      logo: '/startup_logo/interaction.png',
       description: 'Real-time design collaboration tool for distributed teams, enabling seamless creative workflows across time zones.',
       recentIssues: 'Looking for technical co-founder to build MVP and establish real-time synchronization infrastructure.',
       canOffer: 'Design system expertise, UX best practices, early adopter network of 500+ designers, Figma integration knowledge.'
     },
     {
       name: 'Clova',
-      logo: clovaLogo,
+      logo: '/startup_logo/clova.png',
       description: 'Affordable smart home automation for everyone. Democratizing IoT with easy-to-install devices that work seamlessly together.',
       recentIssues: 'Seeking hardware manufacturing partners in Asia and distribution channels for consumer electronics.',
       canOffer: 'IoT expertise, supply chain connections in Shenzhen, smart home protocol knowledge, consumer hardware experience.'

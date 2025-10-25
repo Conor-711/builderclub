@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BountyInfoCard, BountyMeetingInfo } from '@/components/BountyInfoCard';
 import { MatchingReasonsPanel, MatchingReason, Topic } from '@/components/MatchingReasonsPanel';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, ArrowLeft } from 'lucide-react';
-import sonderLogo from '@/assets/startup_logo/sonder.png';
-import interactionLogo from '@/assets/startup_logo/interaction.png';
-import clovaLogo from '@/assets/startup_logo/clova.png';
+// Project logos now loaded from public directory
 
 const BountyMeeting = () => {
   const navigate = useNavigate();
@@ -17,7 +15,7 @@ const BountyMeeting = () => {
   const bounties: BountyMeetingInfo[] = [
     {
       projectName: 'Sonder',
-      projectLogo: sonderLogo,
+      projectLogo: '/startup_logo/sonder.png',
       projectDescription: 'AI-powered empathy platform helping people understand and express emotions better through personalized insights and interactive experiences.',
       bountyRequirements: 'Create 10 TikTok videos demonstrating emotional AI features, each 30-60 seconds, authentic user testimonials preferred',
       bountyReward: '$0.50 per 1K views',
@@ -25,7 +23,7 @@ const BountyMeeting = () => {
     },
     {
       projectName: 'Interaction',
-      projectLogo: interactionLogo,
+      projectLogo: '/startup_logo/interaction.png',
       projectDescription: 'Real-time design collaboration tool for distributed teams, enabling seamless creative workflows across time zones.',
       bountyRequirements: 'Design tutorial videos showing collaborative workflows, minimum 5 videos, focus on remote team scenarios',
       bountyReward: '$0.75 per 1K views',
@@ -33,7 +31,7 @@ const BountyMeeting = () => {
     },
     {
       projectName: 'Clova',
-      projectLogo: clovaLogo,
+      projectLogo: '/startup_logo/clova.png',
       projectDescription: 'Affordable smart home automation for everyone. Democratizing IoT with easy-to-install devices that work seamlessly together.',
       bountyRequirements: 'Product review videos and smart home setup tutorials, 8+ videos, show installation process and daily use cases',
       bountyReward: '$1.00 per 1K views',

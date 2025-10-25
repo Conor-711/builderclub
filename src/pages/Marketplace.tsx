@@ -27,7 +27,7 @@ import { useToast } from '@/hooks/use-toast';
 const demoBounties: Bounty[] = [
   {
     id: '1',
-    image: 'src/assets/startup_logo/sonder.png',
+    image: '/startup_logo/sonder.png',
     title: 'Pro6lema - All Eyes on Rani PHONK UGC/EDIT Campaign',
     totalAmount: 249.02,
     paidAmount: 249.02,
@@ -38,7 +38,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '2',
-    image: 'src/assets/startup_logo/cluely.png',
+    image: '/startup_logo/cluely.png',
     title: 'Artist Launch - TikTok Music Promo Campaign',
     totalAmount: 500.00,
     paidAmount: 325.50,
@@ -49,7 +49,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '3',
-    image: 'src/assets/startup_logo/polymarket.png',
+    image: '/startup_logo/polymarket.png',
     title: 'Indie Band Album Release Promotion',
     totalAmount: 350.00,
     paidAmount: 180.00,
@@ -60,7 +60,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '4',
-    image: 'src/assets/startup_logo/interview.png',
+    image: '/startup_logo/interview.png',
     title: 'DJ Mix Contest - Electronic Music Edition',
     totalAmount: 600.00,
     paidAmount: 420.00,
@@ -71,7 +71,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '5',
-    image: 'src/assets/startup_logo/flora.png',
+    image: '/startup_logo/flora.png',
     title: 'Music Video Challenge - Create Your Version',
     totalAmount: 450.00,
     paidAmount: 450.00,
@@ -82,7 +82,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '6',
-    image: 'src/assets/startup_logo/clova.png',
+    image: '/startup_logo/clova.png',
     title: 'FPS Gameplay Montage Competition',
     totalAmount: 800.00,
     paidAmount: 560.00,
@@ -93,7 +93,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '7',
-    image: 'src/assets/startup_logo/ugctank.png',
+    image: '/startup_logo/ugctank.png',
     title: 'Mobile Game Review Campaign',
     totalAmount: 400.00,
     paidAmount: 200.00,
@@ -104,7 +104,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '8',
-    image: 'src/assets/startup_logo/editly.png',
+    image: '/startup_logo/editly.png',
     title: 'Esports Highlight Reel Challenge',
     totalAmount: 700.00,
     paidAmount: 490.00,
@@ -115,7 +115,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '9',
-    image: 'src/assets/startup_logo/instinct.png',
+    image: '/startup_logo/instinct.png',
     title: 'Game Walkthrough Series Creator Wanted',
     totalAmount: 1000.00,
     paidAmount: 650.00,
@@ -126,7 +126,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '10',
-    image: 'src/assets/startup_logo/series.png',
+    image: '/startup_logo/series.png',
     title: 'Gaming Setup Showcase Competition',
     totalAmount: 300.00,
     paidAmount: 150.00,
@@ -137,7 +137,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '11',
-    image: 'src/assets/startup_logo/articulate.png',
+    image: '/startup_logo/articulate.png',
     title: 'Fashion Brand Launch Campaign',
     totalAmount: 900.00,
     paidAmount: 900.00,
@@ -148,7 +148,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '12',
-    image: 'src/assets/startup_logo/riveter.png',
+    image: '/startup_logo/riveter.png',
     title: 'Lifestyle Vlog Contest - Show Your Day',
     totalAmount: 550.00,
     paidAmount: 275.00,
@@ -159,7 +159,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '13',
-    image: 'src/assets/startup_logo/smooth.png',
+    image: '/startup_logo/smooth.png',
     title: 'Beauty Product Review Campaign',
     totalAmount: 650.00,
     paidAmount: 390.00,
@@ -170,7 +170,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '14',
-    image: 'src/assets/startup_logo/interaction.png',
+    image: '/startup_logo/interaction.png',
     title: 'Fitness Challenge Campaign - 30 Days',
     totalAmount: 750.00,
     paidAmount: 525.00,
@@ -181,7 +181,7 @@ const demoBounties: Bounty[] = [
   },
   {
     id: '15',
-    image: 'src/assets/startup_logo/floweai.png',
+    image: '/startup_logo/floweai.png',
     title: 'Travel Content Creator Program',
     totalAmount: 1200.00,
     paidAmount: 840.00,
@@ -196,7 +196,7 @@ const demoBounties: Bounty[] = [
 const demoUserProjects: ProjectSpace[] = [
   {
     id: 'user-project-1',
-    logo: 'src/assets/startup_logo/sonder.png',
+    logo: '/startup_logo/sonder.png',
     name: 'Sonder',
     initialIdea: 'AI-powered empathy platform',
     description: 'Helping people understand and express emotions better through personalized insights',
@@ -207,7 +207,7 @@ const demoUserProjects: ProjectSpace[] = [
   },
   {
     id: 'user-project-2',
-    logo: 'src/assets/startup_logo/interaction.png',
+    logo: '/startup_logo/interaction.png',
     name: 'Interaction',
     initialIdea: 'Real-time design collaboration tool',
     description: 'Enabling seamless creative workflows for distributed teams',
@@ -218,7 +218,7 @@ const demoUserProjects: ProjectSpace[] = [
   },
   {
     id: 'user-project-3',
-    logo: 'src/assets/startup_logo/clova.png',
+    logo: '/startup_logo/clova.png',
     name: 'Clova',
     initialIdea: 'Smart home automation for everyone',
     description: 'Democratizing IoT with easy-to-install devices that work seamlessly',

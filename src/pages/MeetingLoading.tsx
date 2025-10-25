@@ -3,12 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import sonderLogo from '@/assets/startup_logo/sonder.png';
-import interactionLogo from '@/assets/startup_logo/interaction.png';
-import clovaLogo from '@/assets/startup_logo/clova.png';
-import lovableAd from '@/assets/ads/lovable.png';
-import cursorAd from '@/assets/ads/cursor.png';
-import supabaseAd from '@/assets/ads/supabase.png';
+// Images now loaded from public directory
 
 const MeetingLoading = () => {
   const navigate = useNavigate();
@@ -26,9 +21,9 @@ const MeetingLoading = () => {
   const words = ['Idea', 'Team', 'Build', 'Distribute'];
   
   const ads = [
-    { name: 'Lovable', image: lovableAd },
-    { name: 'Cursor', image: cursorAd },
-    { name: 'Supabase', image: supabaseAd },
+    { name: 'Lovable', image: '/ads/lovable.png' },
+    { name: 'Cursor', image: '/ads/cursor.png' },
+    { name: 'Supabase', image: '/ads/supabase.png' },
   ];
   
   const userParticipants = [
@@ -38,9 +33,9 @@ const MeetingLoading = () => {
   ];
 
   const projectParticipants = [
-    { name: 'Sonder', avatar: sonderLogo },
-    { name: 'Interaction', avatar: interactionLogo },
-    { name: 'Clova', avatar: clovaLogo },
+    { name: 'Sonder', avatar: '/startup_logo/sonder.png' },
+    { name: 'Interaction', avatar: '/startup_logo/interaction.png' },
+    { name: 'Clova', avatar: '/startup_logo/clova.png' },
   ];
 
   const participants = (isProjectMeeting || isBountyMeeting) ? projectParticipants : userParticipants;

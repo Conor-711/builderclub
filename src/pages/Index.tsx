@@ -2,16 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronUp, Utensils } from "lucide-react";
-import appleImage from "@/assets/founders/apple.png";
-import googleImage from "@/assets/founders/google.png";
-import facebookImage from "@/assets/founders/facebook.png";
-import binanceImage from "@/assets/founders/binance.png";
-import paypalImage from "@/assets/founders/paypal.png";
-import figmaImage from "@/assets/founders/figma.png";
-import notionImage from "@/assets/founders/notion.png";
-import cursorImage from "@/assets/founders/cursor.png";
-import cluelyImage from "@/assets/founders/cluely.png";
-import canvaImage from "@/assets/founders/canva.png";
+// Founders images now loaded from public directory
 
 const Index = () => {
   const navigate = useNavigate();
@@ -55,16 +46,16 @@ const Index = () => {
   };
 
   const timeline = [
-    { date: "1976", company: "Apple", founders: "Steve Jobs & Steve Wozniak", image: appleImage },
-    { date: "1998", company: "Google", founders: "Larry Page & Sergey Brin", image: googleImage },
-    { date: "1998", company: "PayPal", founders: "Peter Thiel & Elon Musk", image: paypalImage },
-    { date: "2004", company: "Facebook", founders: "Mark Zuckerberg & Dustin Moskovitz", image: facebookImage },
-    { date: "2013", company: "Notion", founders: "Ivan Zhao & Simon Last", image: notionImage },
-    { date: "2013", company: "Canva", founders: "Melanie Perkins & Cliff Obrecht", image: canvaImage },
-    { date: "2016", company: "Figma", founders: "Dylan Field & Evan Wallace", image: figmaImage },
-    { date: "2017", company: "Binance", founders: "Changpeng Zhao & He Yi", image: binanceImage },
-    { date: "2023", company: "Cursor", founders: "Aman Sanger & Arvid Lunnemark", image: cursorImage },
-    { date: "2024", company: "Cluely", founders: "Roy Lee & Wanying Zhang", image: cluelyImage },
+    { date: "1976", company: "Apple", founders: "Steve Jobs & Steve Wozniak", image: "/founders/apple.png" },
+    { date: "1998", company: "Google", founders: "Larry Page & Sergey Brin", image: "/founders/google.png" },
+    { date: "1998", company: "PayPal", founders: "Peter Thiel & Elon Musk", image: "/founders/paypal.png" },
+    { date: "2004", company: "Facebook", founders: "Mark Zuckerberg & Dustin Moskovitz", image: "/founders/facebook.png" },
+    { date: "2013", company: "Notion", founders: "Ivan Zhao & Simon Last", image: "/founders/notion.png" },
+    { date: "2013", company: "Canva", founders: "Melanie Perkins & Cliff Obrecht", image: "/founders/canva.png" },
+    { date: "2016", company: "Figma", founders: "Dylan Field & Evan Wallace", image: "/founders/figma.png" },
+    { date: "2017", company: "Binance", founders: "Changpeng Zhao & He Yi", image: "/founders/binance.png" },
+    { date: "2023", company: "Cursor", founders: "Aman Sanger & Arvid Lunnemark", image: "/founders/cursor.png" },
+    { date: "2024", company: "Cluely", founders: "Roy Lee & Wanying Zhang", image: "/founders/cluely.png" },
   ];
 
   const maxScroll = typeof document !== 'undefined' 
