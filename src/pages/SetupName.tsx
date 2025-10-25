@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 
 const SetupName = () => {
@@ -90,9 +90,7 @@ const SetupName = () => {
       <div className="w-full max-w-2xl space-y-8">
         <div className="flex justify-center">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-              <User className="w-6 h-6 text-primary-foreground" />
-            </div>
+            <img src="/src/assets/logo/logo.png" alt="BuilderClub" className="w-10 h-10 rounded-full" />
             <span className="text-2xl font-bold text-primary">BuilderClub</span>
           </div>
         </div>
@@ -115,7 +113,7 @@ const SetupName = () => {
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <User className="w-12 h-12 text-muted-foreground" />
+                  <img src="/src/assets/logo/logo.png" alt="BuilderClub" className="w-full h-full object-cover" />
                 )}
               </div>
               <label

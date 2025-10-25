@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -103,9 +101,7 @@ const Index = () => {
         }`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-            <Utensils className="w-6 h-6 text-primary-foreground" />
-          </div>
+          <img src="/src/assets/logo/logo.png" alt="BuilderClub" className="w-10 h-10 rounded-full" />
           <span className="text-xl font-bold text-foreground">BuilderClub</span>
         </div>
       </div>
