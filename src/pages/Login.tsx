@@ -1,18 +1,266 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Utensils } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Utensils, Loader2 } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
+import { analyzeUserProfileAsync } from "@/services/aiService";
 
 const Login = () => {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
+  const [isCheckingSetup, setIsCheckingSetup] = useState(false);
+  
   const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn, signUp, authUser, userData, isAuthLoading } = useUser();
+  const { toast } = useToast();
 
-  const handleGetStarted = () => {
-    if (email) {
-      navigate("/setup-name");
+  // Redirect if already logged in
+  useEffect(() => {
+    const checkAndRedirect = async () => {
+      if (!isAuthLoading && authUser) {
+        setIsCheckingSetup(true);
+        
+        try {
+          console.log('🔍 开始检查 onboarding 状态...');
+          console.log('Auth User ID:', authUser.id);
+          
+          // 给触发器一点时间创建记录（如果是新注册用户）
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // 重新从数据库获取最新的用户数据（不依赖 Context 的 userData）
+          const { data: freshUserData, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', authUser.id)
+            .single();
+          
+          console.log('Fresh user data from DB:', freshUserData);
+          console.log('User data error:', userError);
+          
+          // 如果数据库中还没有记录或没有基本信息，跳转到 onboarding
+          // 检查是否为空字符串（新用户的默认值）或 null
+          if (!freshUserData || !freshUserData.first_name || freshUserData.first_name.trim() === '') {
+            console.log('🆕 New user or incomplete profile, starting onboarding');
+            navigate('/setup-name');
+            return;
+          }
+          
+          // 检查基本信息完整性（SetupName页面字段）
+          if (!freshUserData.last_name || freshUserData.last_name.trim() === '' || 
+              !freshUserData.city || !freshUserData.age || !freshUserData.gender) {
+            console.log('⚠️ Missing basic user data (name, city, age, or gender)');
+            navigate('/setup-name');
+            return;
+          }
+
+          // 检查 objectives（至少需要一个）
+          if (!freshUserData.objectives || freshUserData.objectives.length === 0) {
+            console.log('⚠️ Missing objectives');
+            navigate('/select-objectives');
+            return;
+          }
+
+          // 检查 idea_status
+          if (!freshUserData.idea_status) {
+            console.log('⚠️ Missing idea status');
+            navigate('/select-idea');
+            return;
+          }
+
+          // 检查 idea_fields（至少需要一个）
+          if (!freshUserData.idea_fields || freshUserData.idea_fields.length === 0) {
+            console.log('⚠️ Missing idea fields');
+            navigate('/select-about');
+            return;
+          }
+
+          // 检查 skills（至少需要一个）
+          if (!freshUserData.skills || freshUserData.skills.length === 0) {
+            console.log('⚠️ Missing skills');
+            navigate('/select-skill');
+            return;
+          }
+
+          // 检查 self_qualities（需要5个）
+          if (!freshUserData.self_qualities || freshUserData.self_qualities.length !== 5) {
+            console.log('⚠️ Missing or incomplete self qualities');
+            navigate('/select-self');
+            return;
+          }
+
+          // 检查 desired_qualities（需要5个）
+          if (!freshUserData.desired_qualities || freshUserData.desired_qualities.length !== 5) {
+            console.log('⚠️ Missing or incomplete desired qualities');
+            navigate('/select-other');
+            return;
+          }
+
+          // 🔑 检查 AI 分析状态
+          console.log('🔍 检查 AI 分析状态...');
+          const { data: analysis } = await supabase
+            .from('ai_analysis')
+            .select('id')
+            .eq('user_id', authUser.id)
+            .maybeSingle();
+
+          // 如果用户完成了 onboarding 但没有 AI 分析，后台补全
+          if (!analysis && 
+              freshUserData.first_name && 
+              freshUserData.objectives?.length > 0 &&
+              freshUserData.skills?.length > 0 &&
+              freshUserData.self_qualities?.length === 5 &&
+              freshUserData.desired_qualities?.length === 5) {
+            console.log('🔄 检测到缺失的 AI 分析，正在后台补全...');
+            
+            // 后台触发（不等待），让用户立即进入应用
+            analyzeUserProfileAsync(authUser.id, true)
+              .then(() => {
+                console.log('✅ 后台 AI 分析完成');
+              })
+              .catch(err => {
+                console.error('❌ 后台 AI 分析失败:', err);
+                // 不影响用户登录流程
+              });
+          } else if (analysis) {
+            console.log('✅ 用户已有 AI 分析');
+          }
+
+          // 所有检查通过，进入主页
+          console.log('✅ User has completed onboarding');
+          console.log('🚀 Redirecting to connections');
+          navigate('/connections');
+          
+        } catch (error) {
+          console.error('❌ Error checking onboarding status:', error);
+          // 出错时默认跳转到 setup（新用户）
+          navigate('/setup-name');
+        } finally {
+          setIsCheckingSetup(false);
+        }
+      }
+    };
+
+    checkAndRedirect();
+  }, [authUser, isAuthLoading, navigate]);
+
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await signIn(email, password);
+      toast({
+        title: "Success",
+        description: "Logged in successfully!",
+      });
+      // Navigation will be handled by useEffect above
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid email or password",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await signUp(email, password);
+      toast({
+        title: "Success",
+        description: "Account created successfully! Setting up your profile...",
+      });
+      // 不再切换到登录标签，也不清空密码
+      // useEffect 会自动检测 authUser 并跳转到 onboarding
+      console.log('✅ Registration completed, waiting for auto-redirect...');
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      toast({
+        title: "Signup failed",
+        description: error.message || "Failed to create account. Email may already be in use.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Show loading if checking auth or setup status
+  if (isAuthLoading || isCheckingSetup) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-muted-foreground">
+            {isCheckingSetup ? '正在检查账户状态...' : 'Loading...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -21,11 +269,8 @@ const Login = () => {
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
             <Utensils className="w-6 h-6 text-primary-foreground" />
           </div>
-          <span className="text-2xl font-bold text-primary">lunchclub</span>
+          <span className="text-2xl font-bold text-primary">BuilderClub</span>
         </div>
-        <Button variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-          Log in
-        </Button>
       </header>
 
       <main className="container mx-auto px-6 pt-16">
@@ -41,61 +286,100 @@ const Login = () => {
             </div>
 
             <div className="bg-card rounded-2xl shadow-lg p-8 space-y-6 max-w-lg border">
-              <Button 
-                variant="outline" 
-                className="w-full h-12 text-base border-2"
-              >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Sign up with Google
-              </Button>
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "signup")}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="login">Log In</TabsTrigger>
+                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                </TabsList>
 
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-card px-4 text-muted-foreground">OR</span>
-                </div>
-              </div>
+                {/* Login Tab */}
+                <TabsContent value="login">
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="login-email">Email</Label>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="login-password">Password</Label>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12"
+                      />
+                    </div>
+                    <Button 
+                      type="submit"
+                      className="w-full h-12 text-base"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Logging in...
+                        </>
+                      ) : (
+                        "Log In"
+                      )}
+                    </Button>
+                  </form>
+                </TabsContent>
 
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 h-12 text-base"
-                  onKeyPress={(e) => e.key === "Enter" && handleGetStarted()}
-                />
-                <Button 
-                  onClick={handleGetStarted}
-                  className="h-12 px-6 text-base"
-                >
-                  Get started
-                </Button>
-              </div>
-            </div>
-
-            <p className="text-muted-foreground">
-              Already have an account?{" "}
-              <a href="#" className="text-primary hover:underline">
-                Log in here.
-              </a>
-            </p>
-
-            <div className="pt-4">
-              <div className="bg-card border rounded-xl p-4 inline-flex flex-col items-center shadow-sm">
-                <div className="text-sm font-medium mb-2">Download on the</div>
-                <div className="text-lg font-bold">App Store</div>
-                <div className="mt-2 w-32 h-32 bg-muted rounded-lg flex items-center justify-center">
-                  <div className="text-xs text-center text-muted-foreground">QR Code</div>
-                </div>
-              </div>
+                {/* Signup Tab */}
+                <TabsContent value="signup">
+                  <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-email">Email</Label>
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password">Password</Label>
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        placeholder="At least 6 characters"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={isLoading}
+                        className="h-12"
+                      />
+                    </div>
+                    <Button 
+                      type="submit"
+                      className="w-full h-12 text-base"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Creating account...
+                        </>
+                      ) : (
+                        "Sign Up"
+                      )}
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
 
