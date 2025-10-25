@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import logoImg from "@/assets/logo/logo.png";
+// Logo now loaded from public directory
 import {
   Select,
   SelectContent,
@@ -91,7 +91,7 @@ const SetupName = () => {
       <div className="w-full max-w-2xl space-y-8">
         <div className="flex justify-center">
           <div className="flex items-center gap-2">
-            <img src="/src/assets/logo/logo.png" alt="BuilderClub" className="w-10 h-10 rounded-full" />
+            <img src="/logo.png" alt="BuilderClub" className="w-10 h-10 rounded-full" />
             <span className="text-2xl font-bold text-primary">BuilderClub</span>
           </div>
         </div>
@@ -114,7 +114,7 @@ const SetupName = () => {
                 {avatarPreview ? (
                   <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <img src={logoImg} alt="BuilderClub" className="w-full h-full object-cover" />
+                  <img src="/logo.png" alt="BuilderClub" className="w-full h-full object-cover" />
                 )}
               </div>  
               <label

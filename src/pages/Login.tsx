@@ -266,7 +266,7 @@ const Login = () => {
     <div className="min-h-screen bg-background">
       <header className="flex justify-between items-center p-6">
         <div className="flex items-center gap-2">
-          <img src="/src/assets/logo/logo.png" alt="BuilderClub" className="w-10 h-10 rounded-full" />
+          <img src="/logo.png" alt="BuilderClub" className="w-10 h-10 rounded-full" />
           <span className="text-2xl font-bold text-primary">BuilderClub</span>
         </div>
       </header>
