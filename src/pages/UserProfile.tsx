@@ -73,8 +73,8 @@ const UserProfile = () => {
     } catch (error) {
       console.error('Error loading user profile:', error);
       toast({
-        title: '加载失败',
-        description: '无法加载用户资料',
+        title: 'Load failed',
+        description: 'Cannot load user profile',
         variant: 'destructive',
       });
     } finally {
@@ -89,15 +89,15 @@ const UserProfile = () => {
     try {
       await sendFriendRequest(currentUserId, profileUserId);
       toast({
-        title: '好友请求已发送',
-        description: '等待对方接受',
+        title: 'Friend request sent',
+        description: 'Waiting for other user to accept',
       });
       setFriendshipStatus('pending_sent');
     } catch (error: any) {
       console.error('Error sending friend request:', error);
       toast({
-        title: '发送失败',
-        description: error.message || '无法发送好友请求',
+        title: 'Send failed',
+        description: error.message || 'Cannot send friend request',
         variant: 'destructive',
       });
     } finally {
@@ -130,7 +130,7 @@ const UserProfile = () => {
           <div className="flex items-center justify-center py-32">
             <div className="text-center space-y-4">
               <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-              <p className="text-muted-foreground">加载中...</p>
+              <p className="text-muted-foreground">Loading...</p>
             </div>
           </div>
         </div>
@@ -144,13 +144,13 @@ const UserProfile = () => {
         <div className="p-6 max-w-4xl mx-auto">
           <Card className="p-12 text-center">
             <Users className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">用户不存在</h2>
+            <h2 className="text-xl font-semibold mb-2">User not found</h2>
             <p className="text-muted-foreground mb-6">
-              找不到该用户的资料
+              User not found
             </p>
             <Button onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              返回
+              Back
             </Button>
           </Card>
         </div>
@@ -170,7 +170,7 @@ const UserProfile = () => {
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            返回
+            Back
           </Button>
           
           {/* 只在查看自己的 Profile 时显示 Logout 按钮 */}

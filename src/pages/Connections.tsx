@@ -83,84 +83,14 @@ const Connections = () => {
       <div className="p-6 mx-auto space-y-6 max-w-7xl">
         {/* 头部 */}
         <div className="space-y-4">
-          <div>
+          {/* <div>
             <h1 className="text-3xl font-bold text-foreground">Meet with People</h1>
             <p className="text-muted-foreground mt-1">
               Select your available time slots and we'll match you with the perfect people
             </p>
-          </div>
+          </div> */}
 
           {/* 筛选区域 */}
-          <div className="flex flex-wrap items-center gap-6 p-4 bg-muted/30 rounded-lg border">
-            {/* 是否必须同城 */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-foreground">Same City:</span>
-              <div className="flex gap-2">
-                <Button
-                  variant={sameCityFilter === "YES" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSameCityFilter("YES")}
-                  className="h-8 px-4"
-                >
-                  YES
-                </Button>
-                <Button
-                  variant={sameCityFilter === "NO" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSameCityFilter("NO")}
-                  className="h-8 px-4"
-                >
-                  NO
-                </Button>
-              </div>
-            </div>
-
-            {/* 分隔线 */}
-            <div className="h-8 w-px bg-border" />
-
-            {/* 所处阶段 */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-foreground">Stage:</span>
-              <div className="flex gap-2">
-                <Button
-                  variant={stageFilter === "IDEA" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStageFilter(stageFilter === "IDEA" ? null : "IDEA")}
-                  className="h-8 px-4"
-                >
-                  IDEA
-                </Button>
-                <Button
-                  variant={stageFilter === "BUILDING" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStageFilter(stageFilter === "BUILDING" ? null : "BUILDING")}
-                  className="h-8 px-4"
-                >
-                  BUILDING
-                </Button>
-                <Button
-                  variant={stageFilter === "DISTRIBUTING" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setStageFilter(stageFilter === "DISTRIBUTING" ? null : "DISTRIBUTING")}
-                  className="h-8 px-4"
-                >
-                  DISTRIBUTING
-                </Button>
-              </div>
-            </div>
-
-            {/* 重置按钮 */}
-            {stageFilter && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setStageFilter(null)}
-                className="h-8 text-muted-foreground"
-              >
-                Clear Stage Filter
-              </Button>
-            )}
-          </div>
         </div>
 
         {/* 两栏布局：左侧会面管理，右侧即将到来的会面 */}
@@ -210,6 +140,8 @@ const Connections = () => {
               }}
             />
           </div>
+
+          
           
           {/* 右侧：即将到来的会面 */}
           <div className="lg:sticky lg:top-20 self-start">

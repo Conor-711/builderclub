@@ -72,8 +72,8 @@ export function ScheduledMeetingsList({
     } catch (error) {
       console.error('Error loading meetings:', error);
       toast({
-        title: '加载失败',
-        description: '无法加载会面列表',
+        title: 'Load failed',
+        description: 'Cannot load meeting list',
         variant: 'destructive',
       });
     } finally {
@@ -86,20 +86,20 @@ export function ScheduledMeetingsList({
   }, [userId, status]);
 
   const handleCancel = async (meetingId: string) => {
-    if (!confirm('确定要取消这个会面吗？')) return;
+    if (!confirm('Are you sure you want to cancel this meeting?')) return;
 
     try {
       await cancelMeeting(meetingId, userId);
       toast({
-        title: '已取消',
-        description: '会面已成功取消',
+        title: 'Cancelled',
+        description: 'Meeting cancelled successfully',
       });
       loadMeetings();
     } catch (error) {
       console.error('Error cancelling meeting:', error);
       toast({
-        title: '取消失败',
-        description: '无法取消会面，请稍后重试',
+        title: 'Cancel failed',
+        description: 'Cannot cancel meeting, please try again later',
         variant: 'destructive',
       });
     }
@@ -109,16 +109,16 @@ export function ScheduledMeetingsList({
     try {
       await completeMeeting(meetingId, userId);
       toast({
-        title: '已完成',
-        description: '会面已标记为完成',
+        title: 'Completed',
+        description: 'Meeting marked as completed',
       });
       loadMeetings();
       onMeetingComplete?.();
     } catch (error) {
       console.error('Error completing meeting:', error);
       toast({
-        title: '操作失败',
-        description: '无法标记会面完成，请稍后重试',
+        title: 'Operation failed',
+        description: 'Cannot mark meeting as completed, please try again later',
         variant: 'destructive',
       });
     }
@@ -132,15 +132,15 @@ export function ScheduledMeetingsList({
         // 如果是接受对方的请求
         await acceptFriendRequest(friendshipStatus.friendship.id, userId);
         toast({
-          title: '已接受好友请求',
-          description: '你们现在是好友了',
+          title: 'Accepted friend request',
+          description: 'You are now friends',
         });
       } else {
         // 发送新请求
         await sendFriendRequest(userId, otherUserId, meetingId);
         toast({
-          title: '好友请求已发送',
-          description: '等待对方接受',
+          title: 'Friend request sent',
+          description: 'Waiting for对方接受',
         });
       }
       
@@ -148,8 +148,8 @@ export function ScheduledMeetingsList({
     } catch (error: any) {
       console.error('Error adding friend:', error);
       toast({
-        title: '操作失败',
-        description: error.message || '无法发送好友请求',
+        title: 'Operation failed',
+        description: error.message || 'Cannot send friend request',
         variant: 'destructive',
       });
     }

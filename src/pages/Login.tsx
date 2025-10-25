@@ -255,7 +255,7 @@ const Login = () => {
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
           <p className="text-muted-foreground">
-            {isCheckingSetup ? '正在检查账户状态...' : 'Loading...'}
+            {isCheckingSetup ? 'Checking account status...' : 'Loading...'}
           </p>
         </div>
       </div>
