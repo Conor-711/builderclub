@@ -175,11 +175,11 @@ const Connections = () => {
                   setIntroPartnerNames(newDemoMeeting.partners.map(p => p.name));
                   setShowIntroAnimation(true);
                   
-                  // After 1.5 seconds, hide animation and show dialog
+                  // After 3 seconds, hide animation and show dialog
                   setTimeout(() => {
                     setShowIntroAnimation(false);
                     
-                    // Wait for fade out animation (0.3s) before showing dialog
+                    // Wait for fade out animation (1s) before showing dialog
                     setTimeout(() => {
                       setMatchDialogData({
                         partners: newDemoMeeting.partners,
@@ -188,8 +188,8 @@ const Connections = () => {
                         meetingId: newDemoMeeting.id
                       });
                       setShowMatchDialog(true);
-                    }, 300);
-                  }, 1500);
+                    }, 1000);
+                  }, 3000);
                 }, 5000);
               }}
             />
@@ -250,60 +250,82 @@ const Connections = () => {
         {/* Introduction Animation - appears before dialog */}
         {showIntroAnimation && (
           <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md transition-all duration-1000"
             style={{
-              animation: 'fadeInScale 0.5s ease-out forwards'
+              animation: 'fadeInScale 0.8s ease-out forwards',
+              opacity: showIntroAnimation ? 1 : 0
             }}
           >
-            <div className="text-center space-y-6" style={{
-              animation: 'zoomIn 0.5s ease-out forwards'
+            <div className="text-center space-y-6 px-4" style={{
+              animation: 'zoomInBounce 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards'
             }}>
-              {/* Decorative elements */}
-              <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-              <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+              {/* Enhanced Decorative elements with more glow */}
+              <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
               
               {/* Main content */}
               <div className="relative z-10">
-                {/* Sparkle icon */}
-                <div className="flex justify-center mb-8 animate-bounce">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-purple-500 to-pink-500 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                {/* Enhanced Sparkle icon with glow */}
+                <div className="flex justify-center mb-10" style={{
+                  animation: 'floatBounce 2s ease-in-out infinite'
+                }}>
+                  <div className="relative">
+                    <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border-2 border-white/30">
+                      <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 rounded-full bg-white/20 blur-xl animate-pulse" />
                   </div>
                 </div>
                 
-                {/* "Introduction:" text */}
-                <div className="mb-4">
-                  <p className="text-2xl md:text-3xl font-light text-white/80 tracking-wider uppercase">
+                {/* "Introduction:" text with enhanced styling */}
+                <div className="mb-6">
+                  <p 
+                    className="text-3xl md:text-4xl font-light text-white tracking-[0.3em] uppercase"
+                    style={{
+                      animation: 'fadeIn 0.6s ease-out forwards',
+                      textShadow: '0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.2)'
+                    }}
+                  >
                     Introduction
                   </p>
                 </div>
                 
-                {/* Partner names - Large and designed */}
-                <div className="space-y-2">
+                {/* Partner names - Pure White with enhanced effects */}
+                <div className="space-y-4">
                   <h1 
-                    className="text-5xl md:text-7xl font-black bg-gradient-to-r from-primary via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight tracking-tight"
+                    className="text-6xl md:text-8xl font-black text-white leading-tight tracking-tight"
                     style={{
-                      animation: 'slideUpFade 0.7s ease-out 0.2s forwards',
-                      opacity: 0
+                      animation: 'slideUpFadeScale 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards',
+                      opacity: 0,
+                      textShadow: '0 0 40px rgba(255,255,255,0.4), 0 0 80px rgba(255,255,255,0.2), 0 4px 20px rgba(0,0,0,0.3)'
                     }}
                   >
                     {introPartnerNames.join(' & ')}
                   </h1>
                   
-                  {/* Decorative line */}
-                  <div className="flex justify-center mt-6">
-                    <div className="w-32 h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full animate-pulse" />
+                  {/* Enhanced Decorative line */}
+                  <div className="flex justify-center mt-8" style={{
+                    animation: 'expandFade 0.8s ease-out 0.6s forwards',
+                    opacity: 0
+                  }}>
+                    <div className="relative">
+                      <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent" />
+                      <div className="absolute inset-0 w-48 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent blur-sm" />
+                    </div>
                   </div>
                 </div>
                 
-                {/* Subtitle */}
+                {/* Subtitle with glow */}
                 <p 
-                  className="text-lg md:text-xl text-white/60 font-light tracking-wide mt-8"
+                  className="text-xl md:text-2xl text-white/90 font-light tracking-wide mt-10"
                   style={{
-                    animation: 'fadeIn 0.8s ease-out 0.5s forwards',
-                    opacity: 0
+                    animation: 'fadeIn 1s ease-out 0.8s forwards',
+                    opacity: 0,
+                    textShadow: '0 0 20px rgba(255,255,255,0.3)'
                   }}
                 >
                   Your BuilderClub Matches
@@ -313,47 +335,75 @@ const Connections = () => {
           </div>
         )}
 
-        {/* Add keyframe animations */}
+        {/* Enhanced keyframe animations */}
         <style>{`
           @keyframes fadeInScale {
-            from {
+            0% {
               opacity: 0;
               backdrop-filter: blur(0);
             }
-            to {
+            100% {
               opacity: 1;
-              backdrop-filter: blur(8px);
+              backdrop-filter: blur(12px);
             }
           }
           
-          @keyframes zoomIn {
-            from {
+          @keyframes zoomInBounce {
+            0% {
               opacity: 0;
-              transform: scale(0.9);
+              transform: scale(0.85);
             }
-            to {
+            60% {
+              opacity: 1;
+              transform: scale(1.05);
+            }
+            100% {
               opacity: 1;
               transform: scale(1);
             }
           }
           
-          @keyframes slideUpFade {
-            from {
+          @keyframes slideUpFadeScale {
+            0% {
               opacity: 0;
-              transform: translateY(30px);
+              transform: translateY(40px) scale(0.95);
             }
-            to {
+            60% {
               opacity: 1;
-              transform: translateY(0);
+              transform: translateY(-5px) scale(1.02);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0) scale(1);
             }
           }
           
           @keyframes fadeIn {
-            from {
+            0% {
               opacity: 0;
             }
-            to {
+            100% {
               opacity: 1;
+            }
+          }
+          
+          @keyframes expandFade {
+            0% {
+              opacity: 0;
+              transform: scaleX(0);
+            }
+            100% {
+              opacity: 1;
+              transform: scaleX(1);
+            }
+          }
+          
+          @keyframes floatBounce {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-10px);
             }
           }
         `}</style>
@@ -381,3 +431,4 @@ const Connections = () => {
 };
 
 export default Connections;
+
