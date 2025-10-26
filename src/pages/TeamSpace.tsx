@@ -22,8 +22,8 @@ import { useToast } from '@/hooks/use-toast';
 
 // Demo好友列表
 const demoFriends = [
-  { name: 'Mike', avatar: '/src/assets/users/user2.jpg' },
-  { name: 'Amanda', avatar: '/src/assets/users/user3.jpg' },
+  { name: 'Mike', avatar: '/users/user2.jpg' },
+  { name: 'Amanda', avatar: '/users/user3.jpg' },
 ];
 
 // Demo项目空间数据
@@ -35,8 +35,8 @@ const demoProjects: ProjectSpace[] = [
     initialIdea: 'AI-powered empathy platform',
     description: 'Building an AI platform that helps people understand and express emotions better through personalized insights and interactive experiences.',
     members: [
-      { name: 'Sarah', avatar: '/src/assets/users/user4.jpg', equity: 40 },
-      { name: 'John', avatar: '/src/assets/users/user5.jpg', equity: 35 },
+      { name: 'Sarah', avatar: '/users/user4.jpg', equity: 40 },
+      { name: 'John', avatar: '/users/user5.jpg', equity: 35 },
     ],
     stage: 'developing',
     music: {
@@ -53,9 +53,9 @@ const demoProjects: ProjectSpace[] = [
     initialIdea: 'Smart home automation for everyone',
     description: 'Democratizing smart home technology with affordable, easy-to-install devices that work seamlessly together.',
     members: [
-      { name: 'Mike', avatar: '/src/assets/users/user2.jpg', equity: 50 },
-      { name: 'Amanda', avatar: '/src/assets/users/user3.jpg', equity: 30 },
-      { name: 'Tom', avatar: '/src/assets/users/user5.jpg', equity: 20 }
+      { name: 'Mike', avatar: '/users/user2.jpg', equity: 50 },
+      { name: 'Amanda', avatar: '/users/user3.jpg', equity: 30 },
+      { name: 'Tom', avatar: '/users/user5.jpg', equity: 20 }
     ],
     stage: 'idea',
     createdBy: 'Mike Johnson',

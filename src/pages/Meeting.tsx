@@ -15,7 +15,7 @@ const Meeting = () => {
   const participants: Participant[] = [
     {
       name: 'Amy',
-      avatar: '/src/assets/users/user1.jpg',
+      avatar: '/users/user1.jpg',
       goodAt: 'Product',
       city: 'SF',
       age: 22,
@@ -25,7 +25,7 @@ const Meeting = () => {
     },
     {
       name: 'Mike',
-      avatar: '/src/assets/users/user2.jpg',
+      avatar: '/users/user2.jpg',
       goodAt: 'Programming',
       city: 'New York',
       age: 23,
@@ -35,7 +35,7 @@ const Meeting = () => {
     },
     {
       name: 'Amanda',
-      avatar: '/src/assets/users/user3.jpg',
+      avatar: '/users/user3.jpg',
       goodAt: 'Design',
       city: 'Shanghai',
       age: 21,

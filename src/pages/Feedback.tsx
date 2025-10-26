@@ -36,8 +36,8 @@ const Feedback = () => {
   ];
 
   const friends = [
-    { name: 'Mike', key: 'mike', avatar: '/src/assets/users/user2.jpg' },
-    { name: 'Amanda', key: 'amanda', avatar: '/src/assets/users/user3.jpg' }
+    { name: 'Mike', key: 'mike', avatar: '/users/user2.jpg' },
+    { name: 'Amanda', key: 'amanda', avatar: '/users/user3.jpg' }
   ];
 
   const handleAddFriend = (friendKey: string) => {

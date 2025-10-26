@@ -153,14 +153,14 @@ const Connections = () => {
                     partners: [
                       {
                         name: 'Mike Chen',
-                        avatar: '/src/assets/users/user1.jpg',
+                        avatar: '/users/user1.jpg',
                         goodAt: 'Programming',
                         intro: 'Full-stack developer with 8 years of experience building scalable web applications and leading engineering teams',
                         city: 'San Francisco'
                       },
                       {
                         name: 'Amanda Rodriguez',
-                        avatar: '/src/assets/users/user2.jpg',
+                        avatar: '/users/user2.jpg',
                         goodAt: 'Design',
                         intro: 'Product designer specializing in user experience design and design systems for early-stage startups',
                         city: 'Palo Alto'

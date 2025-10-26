@@ -27,9 +27,9 @@ const MeetingLoading = () => {
   ];
   
   const userParticipants = [
-    { name: 'Amy', avatar: '/src/assets/users/user1.jpg' },
-    { name: 'Mike', avatar: '/src/assets/users/user2.jpg' },
-    { name: 'Amanda', avatar: '/src/assets/users/user3.jpg' },
+    { name: 'Amy', avatar: '/users/user1.jpg' },
+    { name: 'Mike', avatar: '/users/user2.jpg' },
+    { name: 'Amanda', avatar: '/users/user3.jpg' },
   ];
 
   const projectParticipants = [
