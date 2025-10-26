@@ -1,7 +1,8 @@
 import { Card } from './ui/card';
 import { Button } from './ui/button';
-import { ThumbsUp, Trophy, User, Sparkles } from 'lucide-react';
+import { ThumbsUp, Trophy, User, Sparkles, DollarSign } from 'lucide-react';
 import { useState } from 'react';
+import { TipIdeaDialog } from './TipIdeaDialog';
 
 export interface IdeaItem {
   id: string;
@@ -15,11 +16,13 @@ interface IdeaCardProps {
   idea: IdeaItem;
   onVote: (ideaId: string) => void;
   onClaim: (ideaDescription: string) => void;
+  onTip?: (ideaId: string, amount: number) => void;
 }
 
-export function IdeaCard({ idea, onVote, onClaim }: IdeaCardProps) {
+export function IdeaCard({ idea, onVote, onClaim, onTip }: IdeaCardProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showTipDialog, setShowTipDialog] = useState(false);
 
   const handleVote = () => {
     if (hasVoted) return;
@@ -34,6 +37,10 @@ export function IdeaCard({ idea, onVote, onClaim }: IdeaCardProps) {
 
   const handleClaim = () => {
     onClaim(idea.description);
+  };
+
+  const handleTipSent = (amount: number) => {
+    onTip?.(idea.id, amount);
   };
 
   // 根据排名获取徽章颜色
@@ -86,6 +93,17 @@ export function IdeaCard({ idea, onVote, onClaim }: IdeaCardProps) {
           <span className="text-xs font-medium">Claim it</span>
         </Button>
 
+        {/* 打赏按钮 */}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setShowTipDialog(true)}
+          className="w-full gap-1.5 border-green-500/50 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20"
+        >
+          <DollarSign className="w-3.5 h-3.5" />
+          <span className="text-xs font-medium">Tip Creator</span>
+        </Button>
+
         {/* 投票按钮和投票数 */}
         <div className="flex items-center justify-between gap-2">
           <Button
@@ -116,6 +134,15 @@ export function IdeaCard({ idea, onVote, onClaim }: IdeaCardProps) {
       <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
         <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary/10 via-transparent to-transparent" />
       </div>
+
+      {/* 打赏对话框 */}
+      <TipIdeaDialog
+        open={showTipDialog}
+        onOpenChange={setShowTipDialog}
+        ideaProposer={idea.proposer}
+        ideaDescription={idea.description}
+        onTipSent={handleTipSent}
+      />
     </Card>
   );
 }

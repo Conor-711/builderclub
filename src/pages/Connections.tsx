@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TimeMatchingPanel } from "@/components/TimeMatchingPanel";
 import { UpcomingMeetingsPanel } from "@/components/UpcomingMeetingsPanel";
+import { MatchSuccessDialog } from "@/components/MatchSuccessDialog";
+import { UserGuideDialog } from "@/components/UserGuideDialog";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { Users, LogOut } from "lucide-react";
-import { useState } from "react";
+import { Users, LogOut, HelpCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import type { TimeSlot } from "@/lib/supabase";
 
 export type SameCityPreference = "YES" | "NO";
@@ -24,6 +26,8 @@ export interface DemoPartner {
   name: string;
   avatar: string;
   goodAt: string;
+  intro: string;
+  city: string;
 }
 
 export interface DemoMeeting {
@@ -44,6 +48,30 @@ const Connections = () => {
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [demoPendingSlots, setDemoPendingSlots] = useState<DemoSlot[]>([]);
   const [demoMeetings, setDemoMeetings] = useState<DemoMeeting[]>([]);
+  const [showMatchDialog, setShowMatchDialog] = useState(false);
+  const [matchDialogData, setMatchDialogData] = useState<{
+    partners: DemoPartner[];
+    date: string;
+    time: string;
+    meetingId: string;
+  } | null>(null);
+  const [showUserGuide, setShowUserGuide] = useState(false);
+
+  // Check if user is first-time visitor
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenUserGuide');
+    if (!hasSeenGuide && userId) {
+      // Show guide after a short delay for better UX
+      const timer = setTimeout(() => {
+        setShowUserGuide(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [userId]);
+
+  const handleGuideComplete = () => {
+    localStorage.setItem('hasSeenUserGuide', 'true');
+  };
 
   const handleLogout = async () => {
     try {
@@ -124,18 +152,31 @@ const Connections = () => {
                     duration: slot.duration,
                     partners: [
                       {
-                        name: 'Mike',
-                        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike',
-                        goodAt: 'Programming'
+                        name: 'Mike Chen',
+                        avatar: '/src/assets/users/user1.jpg',
+                        goodAt: 'Programming',
+                        intro: 'Full-stack developer with 8 years of experience building scalable web applications and leading engineering teams',
+                        city: 'San Francisco'
                       },
                       {
-                        name: 'Amanda',
-                        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amanda',
-                        goodAt: 'Design'
+                        name: 'Amanda Rodriguez',
+                        avatar: '/src/assets/users/user2.jpg',
+                        goodAt: 'Design',
+                        intro: 'Product designer specializing in user experience design and design systems for early-stage startups',
+                        city: 'Palo Alto'
                       }
                     ]
                   };
                   setDemoMeetings(prev => [...prev, newDemoMeeting]);
+                  
+                  // Trigger match success dialog
+                  setMatchDialogData({
+                    partners: newDemoMeeting.partners,
+                    date: slot.date,
+                    time: slot.time,
+                    meetingId: newDemoMeeting.id
+                  });
+                  setShowMatchDialog(true);
                 }, 5000);
               }}
             />
@@ -158,28 +199,58 @@ const Connections = () => {
           </div>
         </div>
 
-        {/* Demo按钮 - 右下角固定定位 */}
-        <button
-          onClick={() => setIsDemoMode(!isDemoMode)}
-          className={`fixed bottom-8 right-8 px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
-            isDemoMode
-              ? 'bg-foreground text-background border-foreground shadow-lg'
-              : 'bg-background text-foreground border-border hover:border-foreground hover:shadow-md'
-          }`}
-        >
-          <span className="text-sm font-medium">
-            {isDemoMode ? '✓ Demo Mode' : 'Demo'}
-          </span>
-        </button>
+        {/* 右下角按钮组 */}
+        <div className="fixed bottom-8 right-8 flex flex-col gap-3 items-end">
+          {/* User Guide按钮 */}
+          <button
+            onClick={() => setShowUserGuide(true)}
+            className="p-2 rounded-lg bg-background border border-primary/30 hover:bg-primary/10 hover:border-primary/50 text-primary transition-all duration-200 shadow-md hover:shadow-lg hover:scale-110 group"
+            title="User Guide"
+          >
+            <HelpCircle className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+          </button>
 
-        {/* Logout按钮 - 右下角，在Demo按钮上方 */}
-        <button
-          onClick={handleLogout}
-          className="fixed bottom-24 right-8 p-2 rounded-lg bg-background border border-red-200/50 hover:bg-red-50 hover:border-red-300 text-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
-          title="Logout"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
+          {/* Logout按钮 */}
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-lg bg-background border border-red-200/50 hover:bg-red-50 hover:border-red-300 text-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+            title="Logout"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+
+          {/* Demo按钮 */}
+          <button
+            onClick={() => setIsDemoMode(!isDemoMode)}
+            className={`px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
+              isDemoMode
+                ? 'bg-foreground text-background border-foreground shadow-lg'
+                : 'bg-background text-foreground border-border hover:border-foreground hover:shadow-md'
+            }`}
+          >
+            <span className="text-sm font-medium">
+              {isDemoMode ? '✓ Demo Mode' : 'Demo'}
+            </span>
+          </button>
+        </div>
+
+        {/* Match Success Dialog - Demo模式专用 */}
+        <MatchSuccessDialog
+          open={showMatchDialog}
+          onOpenChange={setShowMatchDialog}
+          currentUserName={userData ? `${userData.first_name} ${userData.last_name}` : 'You'}
+          partners={matchDialogData?.partners || []}
+          meetingDate={matchDialogData?.date || ''}
+          meetingTime={matchDialogData?.time || ''}
+          meetingId={matchDialogData?.meetingId || ''}
+        />
+
+        {/* User Guide Dialog */}
+        <UserGuideDialog
+          open={showUserGuide}
+          onOpenChange={setShowUserGuide}
+          onComplete={handleGuideComplete}
+        />
       </div>
     </AppLayout>
   );

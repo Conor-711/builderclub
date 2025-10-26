@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from "@/components/AppLayout";
 import { IdeaCard, IdeaItem } from '@/components/IdeaCard';
+import { TrendingIdeasCarousel } from '@/components/TrendingIdeasCarousel';
 import { Lightbulb } from 'lucide-react';
 
 // Demo ideas 数据
@@ -150,6 +151,12 @@ const Idea = () => {
     navigate('/team-space?openCreate=true');
   };
 
+  const handleTip = (ideaId: string, amount: number) => {
+    console.log(`Tip sent: $${amount} to idea ${ideaId}`);
+    // 这里可以添加实际的支付逻辑
+    // 例如：调用 Stripe API, 更新数据库等
+  };
+
   return (
     <AppLayout>
       <div className="p-6 max-w-[1600px] mx-auto">
@@ -163,6 +170,14 @@ const Idea = () => {
             <p className="text-muted-foreground">Discover and vote for the next big thing</p>
           </div>
         </div>
+
+        {/* 热门 Idea 轮播 */}
+        <TrendingIdeasCarousel
+          ideas={ideas}
+          onVote={handleVote}
+          onClaim={handleClaim}
+          onTip={handleTip}
+        />
 
         {/* 统计信息 */}
         <div className="grid grid-cols-3 gap-4 mb-8">
@@ -190,6 +205,7 @@ const Idea = () => {
               idea={idea}
               onVote={handleVote}
               onClaim={handleClaim}
+              onTip={handleTip}
             />
           ))}
         </div>

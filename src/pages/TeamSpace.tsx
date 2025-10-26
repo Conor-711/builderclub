@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import AppLayout from "@/components/AppLayout";
 import { ProjectSpaceCard, ProjectSpace, TeamMember } from '@/components/ProjectSpaceCard';
+import { MySpaceEditor, MySpace } from '@/components/MySpaceEditor';
 import { Button } from '@/components/ui/button';
 import { Plus, Building2, ImageIcon, Music } from 'lucide-react';
 import {
@@ -21,10 +22,8 @@ import { useToast } from '@/hooks/use-toast';
 
 // Demo好友列表
 const demoFriends = [
-  { name: 'Mike', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike' },
-  { name: 'Amanda', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amanda' },
-  { name: 'John', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John' },
-  { name: 'Sarah', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' }
+  { name: 'Mike', avatar: '/src/assets/users/user2.jpg' },
+  { name: 'Amanda', avatar: '/src/assets/users/user3.jpg' },
 ];
 
 // Demo项目空间数据
@@ -36,9 +35,8 @@ const demoProjects: ProjectSpace[] = [
     initialIdea: 'AI-powered empathy platform',
     description: 'Building an AI platform that helps people understand and express emotions better through personalized insights and interactive experiences.',
     members: [
-      { name: 'Sarah', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah', equity: 40 },
-      { name: 'John', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=John', equity: 35 },
-      { name: 'Lisa', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lisa', equity: 25 }
+      { name: 'Sarah', avatar: '/src/assets/users/user4.jpg', equity: 40 },
+      { name: 'John', avatar: '/src/assets/users/user5.jpg', equity: 35 },
     ],
     stage: 'developing',
     music: {
@@ -55,9 +53,9 @@ const demoProjects: ProjectSpace[] = [
     initialIdea: 'Smart home automation for everyone',
     description: 'Democratizing smart home technology with affordable, easy-to-install devices that work seamlessly together.',
     members: [
-      { name: 'Mike', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike', equity: 50 },
-      { name: 'Amanda', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amanda', equity: 30 },
-      { name: 'Tom', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Tom', equity: 20 }
+      { name: 'Mike', avatar: '/src/assets/users/user2.jpg', equity: 50 },
+      { name: 'Amanda', avatar: '/src/assets/users/user3.jpg', equity: 30 },
+      { name: 'Tom', avatar: '/src/assets/users/user5.jpg', equity: 20 }
     ],
     stage: 'idea',
     createdBy: 'Mike Johnson',
@@ -148,6 +146,11 @@ const TeamSpace = () => {
     const saved = localStorage.getItem('userProjects');
     return saved ? JSON.parse(saved) : [];
   });
+  const [mySpace, setMySpace] = useState<MySpace | null>(() => {
+    // 从 localStorage 加载个人空间
+    const saved = localStorage.getItem('userMySpace');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newProject, setNewProject] = useState(initialProjectState);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
@@ -191,6 +194,27 @@ const TeamSpace = () => {
       setSearchParams({});
     }
   }, [searchParams, setSearchParams]);
+
+  // 检查是否是首次创建个人空间并自动切换到 MySpace 标签页
+  useEffect(() => {
+    const isFirstTimeUser = localStorage.getItem('hasCreatedMySpace');
+    if (!isFirstTimeUser && !mySpace) {
+      // 如果是首次用户且还没有个人空间，切换到 myspace 标签页
+      setActiveTab('myspace');
+    }
+  }, [mySpace]);
+
+  // 保存个人空间
+  const handleSaveMySpace = (space: MySpace) => {
+    setMySpace(space);
+    localStorage.setItem('userMySpace', JSON.stringify(space));
+    localStorage.setItem('hasCreatedMySpace', 'true');
+    
+    toast({
+      title: 'Space saved!',
+      description: 'Your personal space has been saved successfully.'
+    });
+  };
 
   // Friends' Space 显示包含用户好友的项目
   const friendsList = ['Mike', 'Amanda'];
@@ -398,47 +422,82 @@ const TeamSpace = () => {
           </div>
         </div>
 
+        {/* MySpace 标签页：显示个人空间编辑器 */}
+        {activeTab === 'myspace' && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <MySpaceEditor 
+              space={mySpace} 
+              onSave={handleSaveMySpace}
+            />
+          </div>
+        )}
+
         {/* 项目空间Feeds流 */}
-        {displayedProjects.length > 0 ? (
+        {activeTab !== 'myspace' && (
+          <>
+            {displayedProjects.length > 0 ? (
+              <div className="max-w-2xl mx-auto space-y-4">
+                {displayedProjects.map((project) => (
+                  <ProjectSpaceCard 
+                    key={project.id} 
+                    project={project}
+                    showJoinMeeting={false}
+                    onJoinMeeting={handleJoinMeeting}
+                  />
+                ))}
+              </div>
+            ) : (
+              // 空状态
+              <div className="max-w-2xl mx-auto text-center py-16">
+                <Building2 className="w-20 h-20 mx-auto mb-6 text-muted-foreground" />
+                <h3 className="text-2xl font-semibold mb-3">No projects yet</h3>
+                <p className="text-muted-foreground mb-6">
+                  {activeTab === 'friends'
+                    ? "Your friends haven't created any projects yet"
+                    : "Be the first to create a project space"}
+                </p>
+                {activeTab === 'public' && (
+                  <Button onClick={handleOpenCreateDialog} size="lg">
+                    <Plus className="w-5 h-5 mr-2" />
+                    Create Project Space
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* MySpace 标签页：显示用户的项目列表 */}
+        {activeTab === 'myspace' && myProjects.length > 0 && (
           <div className="max-w-2xl mx-auto space-y-4">
-            {displayedProjects.map((project) => (
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">My Projects</h3>
+              <Button onClick={handleOpenCreateDialog} variant="outline" size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                New Project
+              </Button>
+            </div>
+            {myProjects.map((project) => (
               <ProjectSpaceCard 
                 key={project.id} 
                 project={project}
-                showJoinMeeting={activeTab === 'myspace'}
+                showJoinMeeting={true}
                 onJoinMeeting={handleJoinMeeting}
               />
             ))}
           </div>
-        ) : (
-          // 空状态
-          <div className="max-w-2xl mx-auto text-center py-16">
-            <Building2 className="w-20 h-20 mx-auto mb-6 text-muted-foreground" />
-            <h3 className="text-2xl font-semibold mb-3">No projects yet</h3>
-            <p className="text-muted-foreground mb-6">
-              {activeTab === 'friends'
-                ? "Your friends haven't created any projects yet"
-                : activeTab === 'myspace'
-                ? "You haven't created any projects yet"
-                : "Be the first to create a project space"}
-            </p>
-            {(activeTab === 'public' || activeTab === 'myspace') && (
-              <Button onClick={handleOpenCreateDialog} size="lg">
-                <Plus className="w-5 h-5 mr-2" />
-                Create Project Space
-              </Button>
-            )}
-          </div>
         )}
 
-        {/* 创建项目浮动按钮 */}
-        <Button
-          onClick={handleOpenCreateDialog}
-          className="fixed bottom-8 right-8 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-shadow p-0"
-          size="icon"
-        >
-          <Plus className="w-6 h-6" />
-        </Button>
+        {/* 创建项目浮动按钮 - 仅在 public 和 friends 标签页显示 */}
+        {activeTab !== 'myspace' && (
+          <Button
+            onClick={handleOpenCreateDialog}
+            className="fixed bottom-8 right-8 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-shadow p-0"
+            size="icon"
+          >
+            <Plus className="w-6 h-6" />
+          </Button>
+        )}
 
         {/* 创建项目对话框 */}
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>

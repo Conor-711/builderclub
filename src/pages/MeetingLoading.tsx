@@ -27,9 +27,9 @@ const MeetingLoading = () => {
   ];
   
   const userParticipants = [
-    { name: 'Amy', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amy' },
-    { name: 'Mike', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike' },
-    { name: 'Amanda', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amanda' },
+    { name: 'Amy', avatar: '/src/assets/users/user1.jpg' },
+    { name: 'Mike', avatar: '/src/assets/users/user2.jpg' },
+    { name: 'Amanda', avatar: '/src/assets/users/user3.jpg' },
   ];
 
   const projectParticipants = [

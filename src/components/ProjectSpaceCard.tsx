@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Card } from './ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 import { Badge } from './ui/badge';
@@ -34,6 +35,8 @@ interface ProjectSpaceCardProps {
 }
 
 export function ProjectSpaceCard({ project, showJoinMeeting, onJoinMeeting }: ProjectSpaceCardProps) {
+  const navigate = useNavigate();
+  
   const stageConfig = {
     'idea': { label: 'Idea Stage', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },
     'developing': { label: 'Developing', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
@@ -45,8 +48,20 @@ export function ProjectSpaceCard({ project, showJoinMeeting, onJoinMeeting }: Pr
   const displayMembers = project.members.slice(0, 4);
   const remainingCount = project.members.length - 4;
 
+  const handleCardClick = () => {
+    navigate(`/team-space/${project.id}`);
+  };
+
+  const handleJoinMeetingClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onJoinMeeting?.();
+  };
+
   return (
-    <Card className="p-6 hover:shadow-lg transition-shadow duration-200">
+    <Card 
+      className="p-6 hover:shadow-lg transition-all duration-200 cursor-pointer hover:border-primary/50" 
+      onClick={handleCardClick}
+    >
       {/* 顶部：Logo 和项目信息 */}
       <div className="flex gap-4 mb-4">
         <img 
@@ -125,7 +140,7 @@ export function ProjectSpaceCard({ project, showJoinMeeting, onJoinMeeting }: Pr
       {showJoinMeeting && onJoinMeeting && (
         <div className="mt-4 pt-4 border-t">
           <Button 
-            onClick={onJoinMeeting}
+            onClick={handleJoinMeetingClick}
             className="w-full"
             size="lg"
           >

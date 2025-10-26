@@ -38,6 +38,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [userId, setUserId] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [conversationStarters, setConversationStarters] = useState<ConversationStarter[]>([]);
+  const [isLoadingUserData, setIsLoadingUserData] = useState(false);
   
   // AI analysis state
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -137,12 +138,22 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const targetId = idToUse || userId;
     if (!targetId) return;
 
+    // Prevent multiple simultaneous loads
+    if (isLoadingUserData) {
+      console.log('User data already loading, skipping...');
+      return;
+    }
+
+    setIsLoadingUserData(true);
+
     try {
-      // Parallel fetch for better performance
-      const [userResult, startersResult] = await Promise.all([
-        supabase.from('users').select('*').eq('id', targetId).single(),
-        supabase.from('conversation_starters').select('*').eq('user_id', targetId)
-      ]);
+      // Load essential user data first (non-blocking)
+      const userResult = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', targetId)
+        .single()
+        .abortSignal(AbortSignal.timeout(10000)); // 10 second timeout
 
       // Handle user data
       if (userResult.error) {
@@ -151,22 +162,43 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('User profile not found yet, will be created during setup');
           setUserData(null);
           setConversationStarters([]);
+          setIsLoadingUserData(false);
           return;
         }
         throw userResult.error;
       }
       setUserData(userResult.data as UserData);
+      setIsLoadingUserData(false);
 
-      // Handle conversation starters
-      if (startersResult.error && startersResult.error.code !== 'PGRST116') {
-        throw startersResult.error;
-      }
-      setConversationStarters((startersResult.data as ConversationStarter[]) || []);
+      // Load conversation starters in background (non-blocking, optional)
+      // This won't block the page if it fails or takes too long
+      supabase
+        .from('conversation_starters')
+        .select('*')
+        .eq('user_id', targetId)
+        .abortSignal(AbortSignal.timeout(5000)) // 5 second timeout
+        .then(startersResult => {
+          if (!startersResult.error || startersResult.error.code === 'PGRST116') {
+            setConversationStarters((startersResult.data as ConversationStarter[]) || []);
+          } else {
+            console.log('Conversation starters not available:', startersResult.error.message);
+            setConversationStarters([]);
+          }
+        })
+        .catch(error => {
+          console.log('Failed to load conversation starters:', error.message);
+          setConversationStarters([]);
+        });
+
     } catch (error: any) {
+      setIsLoadingUserData(false);
       // Only log if it's not a "not found" error
       if (error?.code !== 'PGRST116') {
         console.error('Error loading user data:', error);
       }
+      // Set empty state to unblock the UI
+      setUserData(null);
+      setConversationStarters([]);
     }
   };
 

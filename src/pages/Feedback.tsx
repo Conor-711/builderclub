@@ -36,8 +36,8 @@ const Feedback = () => {
   ];
 
   const friends = [
-    { name: 'Mike', key: 'mike', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike' },
-    { name: 'Amanda', key: 'amanda', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Amanda' }
+    { name: 'Mike', key: 'mike', avatar: '/src/assets/users/user2.jpg' },
+    { name: 'Amanda', key: 'amanda', avatar: '/src/assets/users/user3.jpg' }
   ];
 
   const handleAddFriend = (friendKey: string) => {

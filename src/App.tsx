@@ -18,6 +18,7 @@ import Home from "./pages/Home";
 import Connections from "./pages/Connections";
 import Idea from "./pages/Idea";
 import TeamSpace from "./pages/TeamSpace";
+import TeamSpaceDetail from "./pages/TeamSpaceDetail";
 import Marketplace from "./pages/Marketplace";
 import ConnectionHistory from "./pages/ConnectionHistory";
 import Settings from "./pages/Settings";
@@ -76,6 +77,9 @@ const App = () => (
           } />
           <Route path="/team-space" element={
             <ProtectedRoute><TeamSpace /></ProtectedRoute>
+          } />
+          <Route path="/team-space/:projectId" element={
+            <ProtectedRoute><TeamSpaceDetail /></ProtectedRoute>
           } />
           <Route path="/marketplace" element={
             <ProtectedRoute><Marketplace /></ProtectedRoute>

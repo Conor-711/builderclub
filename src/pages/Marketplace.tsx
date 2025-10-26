@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from "@/components/AppLayout";
 import { BountyCard, Bounty } from '@/components/BountyCard';
+import { TrendingBountiesCarousel } from '@/components/TrendingBountiesCarousel';
 import { ProjectSpace } from '@/components/ProjectSpaceCard';
 import { Button } from '@/components/ui/button';
 import { Plus, Store, Video } from 'lucide-react';
@@ -337,6 +338,13 @@ const Marketplace = () => {
     navigate('/meeting-loading?type=bounty');
   };
 
+  const handleApplyBounty = (bountyId: string) => {
+    toast({
+      title: 'Application sent!',
+      description: 'Your application for this bounty has been submitted successfully.'
+    });
+  };
+
   const displayedBounties = activeTab === 'marketplace' ? demoBounties : myBounties;
 
   return (
@@ -385,6 +393,14 @@ const Marketplace = () => {
             </Button>
           )}
         </div>
+
+        {/* 热门悬赏轮播 - 仅在Marketplace标签页显示 */}
+        {activeTab === 'marketplace' && (
+          <TrendingBountiesCarousel 
+            bounties={demoBounties}
+            onApply={handleApplyBounty}
+          />
+        )}
 
         {/* 悬赏卡片网格 */}
         {displayedBounties.length > 0 ? (

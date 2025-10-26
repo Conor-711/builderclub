@@ -95,6 +95,91 @@ export function generateTimeOptions(): string[] {
 }
 
 /**
+ * 生成固定的可用时间选项
+ * @returns 固定时间选项数组 ['09:00', '11:00', '13:00', '17:00', '19:00', '20:00', '21:00', '22:00']
+ */
+export function generateFixedTimeOptions(): string[] {
+  return ['09:00', '11:00', '13:00', '17:00', '19:00', '20:00', '21:00', '22:00'];
+}
+
+/**
+ * 时间段类型定义
+ */
+export type TimePeriod = 'MORNING' | 'NOON' | 'AFTERNOON' | 'EVENING';
+
+/**
+ * 时间段到具体时间的映射
+ */
+export const TIME_PERIOD_MAP: Record<TimePeriod, string[]> = {
+  MORNING: ['09:00', '11:00'],
+  NOON: ['13:00'],
+  AFTERNOON: ['17:00'],
+  EVENING: ['19:00', '20:00', '21:00', '22:00'],
+};
+
+/**
+ * 时间段显示名称
+ */
+export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
+  MORNING: 'Morning',
+  NOON: 'Noon',
+  AFTERNOON: 'Afternoon',
+  EVENING: 'Evening',
+};
+
+/**
+ * 时间段图标
+ */
+export const TIME_PERIOD_ICONS: Record<TimePeriod, string> = {
+  MORNING: '🌅',
+  NOON: '☀️',
+  AFTERNOON: '🌤️',
+  EVENING: '🌙',
+};
+
+/**
+ * 获取时间段的初始推荐时间（中间时间）
+ * @param period 时间段
+ * @returns 推荐的时间
+ */
+export function getInitialTimeForPeriod(period: TimePeriod): string {
+  const times = TIME_PERIOD_MAP[period];
+  // 返回中间的时间
+  const middleIndex = Math.floor(times.length / 2);
+  return times[middleIndex];
+}
+
+/**
+ * 获取时间段中的下一个时间
+ * @param period 时间段
+ * @param currentTime 当前时间
+ * @returns 下一个时间，如果没有则返回 null
+ */
+export function getNextTimeInPeriod(period: TimePeriod, currentTime: string): string | null {
+  const times = TIME_PERIOD_MAP[period];
+  const currentIndex = times.indexOf(currentTime);
+  if (currentIndex === -1 || currentIndex === times.length - 1) {
+    return null;
+  }
+  return times[currentIndex + 1];
+}
+
+/**
+ * 获取时间段中的上一个时间
+ * @param period 时间段
+ * @param currentTime 当前时间
+ * @returns 上一个时间，如果没有则返回 null
+ */
+export function getPreviousTimeInPeriod(period: TimePeriod, currentTime: string): string | null {
+  const times = TIME_PERIOD_MAP[period];
+  const currentIndex = times.indexOf(currentTime);
+  if (currentIndex === -1 || currentIndex === 0) {
+    return null;
+  }
+  return times[currentIndex - 1];
+}
+
+/**
  * 格式化日期为 YYYY-MM-DD
  * @param date Date 对象
  * @returns YYYY-MM-DD 格式的字符串
