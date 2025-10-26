@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from "@/components/AppLayout";
 import { BountyCard, Bounty } from '@/components/BountyCard';
+import { CourseCard, Course } from '@/components/CourseCard';
 import { TrendingBountiesCarousel } from '@/components/TrendingBountiesCarousel';
+import { TrendingCoursesCarousel } from '@/components/TrendingCoursesCarousel';
 import { ProjectSpace } from '@/components/ProjectSpaceCard';
 import { Button } from '@/components/ui/button';
 import { Plus, Store, Video } from 'lucide-react';
@@ -244,10 +246,108 @@ const initialBountyState = {
   potentialCreators: undefined
 };
 
+// Demo课程数据
+const demoCourses: Course[] = [
+  {
+    id: '1',
+    title: 'Building Viral TikTok Content: From Zero to 1M Views',
+    description: 'Learn the exact strategies we used to grow from 0 to 1M followers on TikTok',
+    instructor: 'Sarah Chen',
+    instructorAvatar: '/users/user4.jpg',
+    projectName: 'Sonder',
+    projectLogo: '/startup_logo/sonder.png',
+    price: 49.99,
+    originalPrice: 99.99,
+    rating: 4.8,
+    studentsCount: 1245,
+    duration: '3.5 hours',
+    lessonsCount: 24,
+    category: 'Marketing',
+    level: 'Intermediate',
+    thumbnail: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800&h=450&fit=crop',
+    tags: ['TikTok', 'Social Media', 'Content Strategy']
+  },
+  {
+    id: '2',
+    title: 'Smart Home Product Design: Hardware to Market',
+    description: 'Complete guide to designing, prototyping and launching IoT products',
+    instructor: 'Mike Johnson',
+    instructorAvatar: '/users/user2.jpg',
+    projectName: 'Clova',
+    projectLogo: '/startup_logo/clova.png',
+    price: 79.99,
+    originalPrice: 149.99,
+    rating: 4.9,
+    studentsCount: 856,
+    duration: '5.2 hours',
+    lessonsCount: 32,
+    category: 'Product Design',
+    level: 'Advanced',
+    thumbnail: 'https://images.unsplash.com/photo-1558002038-1055907df827?w=800&h=450&fit=crop',
+    tags: ['IoT', 'Hardware', 'Product Launch']
+  },
+  {
+    id: '3',
+    title: 'Crypto Trading Strategies for Beginners',
+    description: 'Master prediction markets and crypto trading fundamentals',
+    instructor: 'Alex Rodriguez',
+    instructorAvatar: '/users/user1.jpg',
+    projectName: 'Polymarket',
+    projectLogo: '/startup_logo/polymarket.png',
+    price: 59.99,
+    rating: 4.7,
+    studentsCount: 2103,
+    duration: '4.0 hours',
+    lessonsCount: 28,
+    category: 'Finance',
+    level: 'Beginner',
+    thumbnail: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=800&h=450&fit=crop',
+    tags: ['Crypto', 'Trading', 'Blockchain']
+  },
+  {
+    id: '4',
+    title: 'AI Plant Recognition: Building Computer Vision Apps',
+    description: 'Learn to build ML models for plant disease detection',
+    instructor: 'Amanda Lee',
+    instructorAvatar: '/users/user3.jpg',
+    projectName: 'Flora',
+    projectLogo: '/startup_logo/flora.png',
+    price: 89.99,
+    originalPrice: 129.99,
+    rating: 4.9,
+    studentsCount: 678,
+    duration: '6.5 hours',
+    lessonsCount: 42,
+    category: 'AI & ML',
+    level: 'Advanced',
+    thumbnail: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=450&fit=crop',
+    tags: ['Machine Learning', 'Computer Vision', 'TensorFlow']
+  },
+  {
+    id: '5',
+    title: 'Fitness App Development: React Native Complete Guide',
+    description: 'Build a fitness tracking app from scratch with AI coaching features',
+    instructor: 'Ryan Martinez',
+    instructorAvatar: '/users/user5.jpg',
+    projectName: 'Instinct',
+    projectLogo: '/startup_logo/instinct.png',
+    price: 69.99,
+    originalPrice: 119.99,
+    rating: 4.6,
+    studentsCount: 1534,
+    duration: '8.0 hours',
+    lessonsCount: 48,
+    category: 'Mobile Development',
+    level: 'Intermediate',
+    thumbnail: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&h=450&fit=crop',
+    tags: ['React Native', 'Mobile', 'Fitness Tech']
+  }
+];
+
 const Marketplace = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'marketplace' | 'my-bounties'>('marketplace');
+  const [activeTab, setActiveTab] = useState<'bounties' | 'courses' | 'my-bounties'>('bounties');
   const [myBounties, setMyBounties] = useState<Bounty[]>([]);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newBounty, setNewBounty] = useState(initialBountyState);
@@ -345,7 +445,14 @@ const Marketplace = () => {
     });
   };
 
-  const displayedBounties = activeTab === 'marketplace' ? demoBounties : myBounties;
+  const handlePurchaseCourse = (courseId: string) => {
+    toast({
+      title: 'Course purchased!',
+      description: 'You now have access to this course. Start learning!'
+    });
+  };
+
+  const displayedBounties = activeTab === 'my-bounties' ? myBounties : demoBounties;
 
   return (
     <AppLayout>
@@ -359,14 +466,24 @@ const Marketplace = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-3">
             <button
-              onClick={() => setActiveTab('marketplace')}
+              onClick={() => setActiveTab('bounties')}
               className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
-                activeTab === 'marketplace'
+                activeTab === 'bounties'
                   ? 'bg-primary text-primary-foreground shadow-md'
                   : 'bg-background border border-border hover:bg-accent'
               }`}
             >
-              Marketplace
+              Bounties
+            </button>
+            <button
+              onClick={() => setActiveTab('courses')}
+              className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
+                activeTab === 'courses'
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-background border border-border hover:bg-accent'
+              }`}
+            >
+              Courses
             </button>
             <button
               onClick={() => setActiveTab('my-bounties')}
@@ -394,22 +511,51 @@ const Marketplace = () => {
           )}
         </div>
 
-        {/* 热门悬赏轮播 - 仅在Marketplace标签页显示 */}
-        {activeTab === 'marketplace' && (
+        {/* 热门悬赏轮播 - 仅在Bounties标签页显示 */}
+        {activeTab === 'bounties' && (
           <TrendingBountiesCarousel 
             bounties={demoBounties}
             onApply={handleApplyBounty}
           />
         )}
 
+        {/* 热门课程轮播 - 仅在Courses标签页显示 */}
+        {activeTab === 'courses' && (
+          <TrendingCoursesCarousel 
+            courses={demoCourses}
+            onPurchase={handlePurchaseCourse}
+          />
+        )}
+
         {/* 悬赏卡片网格 */}
-        {displayedBounties.length > 0 ? (
+        {activeTab === 'bounties' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {demoBounties.map((bounty) => (
+              <BountyCard key={bounty.id} bounty={bounty} />
+            ))}
+          </div>
+        )}
+
+        {/* 课程卡片网格 */}
+        {activeTab === 'courses' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {demoCourses.map((course) => (
+              <CourseCard key={course.id} course={course} onPurchase={handlePurchaseCourse} />
+            ))}
+          </div>
+        )}
+
+        {/* My Bounties列表 */}
+        {activeTab === 'my-bounties' && displayedBounties.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {displayedBounties.map((bounty) => (
               <BountyCard key={bounty.id} bounty={bounty} />
             ))}
           </div>
-        ) : (
+        )}
+
+        {/* My Bounties空状态 */}
+        {activeTab === 'my-bounties' && displayedBounties.length === 0 && (
           // My Bounties 空状态
           <div className="text-center py-16">
             <Store className="w-20 h-20 mx-auto mb-6 text-muted-foreground" />
