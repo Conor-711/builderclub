@@ -435,33 +435,33 @@ const TeamSpace = () => {
         {/* 项目空间Feeds流 */}
         {activeTab !== 'myspace' && (
           <>
-            {displayedProjects.length > 0 ? (
-              <div className="max-w-2xl mx-auto space-y-4">
-                {displayedProjects.map((project) => (
-                  <ProjectSpaceCard 
-                    key={project.id} 
-                    project={project}
+        {displayedProjects.length > 0 ? (
+          <div className="max-w-2xl mx-auto space-y-4">
+            {displayedProjects.map((project) => (
+              <ProjectSpaceCard 
+                key={project.id} 
+                project={project}
                     showJoinMeeting={false}
-                    onJoinMeeting={handleJoinMeeting}
-                  />
-                ))}
-              </div>
-            ) : (
-              // 空状态
-              <div className="max-w-2xl mx-auto text-center py-16">
-                <Building2 className="w-20 h-20 mx-auto mb-6 text-muted-foreground" />
-                <h3 className="text-2xl font-semibold mb-3">No projects yet</h3>
-                <p className="text-muted-foreground mb-6">
-                  {activeTab === 'friends'
-                    ? "Your friends haven't created any projects yet"
-                    : "Be the first to create a project space"}
-                </p>
+                onJoinMeeting={handleJoinMeeting}
+              />
+            ))}
+          </div>
+        ) : (
+          // 空状态
+          <div className="max-w-2xl mx-auto text-center py-16">
+            <Building2 className="w-20 h-20 mx-auto mb-6 text-muted-foreground" />
+            <h3 className="text-2xl font-semibold mb-3">No projects yet</h3>
+            <p className="text-muted-foreground mb-6">
+              {activeTab === 'friends'
+                ? "Your friends haven't created any projects yet"
+                : "Be the first to create a project space"}
+            </p>
                 {activeTab === 'public' && (
-                  <Button onClick={handleOpenCreateDialog} size="lg">
-                    <Plus className="w-5 h-5 mr-2" />
-                    Create Project Space
-                  </Button>
-                )}
+              <Button onClick={handleOpenCreateDialog} size="lg">
+                <Plus className="w-5 h-5 mr-2" />
+                Create Project Space
+              </Button>
+            )}
               </div>
             )}
           </>
@@ -490,13 +490,13 @@ const TeamSpace = () => {
 
         {/* 创建项目浮动按钮 - 仅在 public 和 friends 标签页显示 */}
         {activeTab !== 'myspace' && (
-          <Button
-            onClick={handleOpenCreateDialog}
-            className="fixed bottom-8 right-8 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-shadow p-0"
-            size="icon"
-          >
-            <Plus className="w-6 h-6" />
-          </Button>
+        <Button
+          onClick={handleOpenCreateDialog}
+          className="fixed bottom-8 right-8 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-shadow p-0"
+          size="icon"
+        >
+          <Plus className="w-6 h-6" />
+        </Button>
         )}
 
         {/* 创建项目对话框 */}

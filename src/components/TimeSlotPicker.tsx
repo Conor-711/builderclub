@@ -92,16 +92,16 @@ export function TimeSlotPicker({
   return (
     <div className="space-y-6">
       {/* 周历选择器 */}
-      <div>
+        <div>
         <Label className="text-base mb-3 block">Select Date</Label>
         <WeekCalendar
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}
-        />
-      </div>
+            />
+        </div>
 
       {/* 时间段选择 */}
-      <div>
+        <div>
         <Label className="text-base mb-3 block">Select Time Period</Label>
         <div className="grid grid-cols-2 gap-3">
           {TIME_PERIODS.map((period) => (
@@ -152,9 +152,9 @@ export function TimeSlotPicker({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 rounded-full bg-primary" />
-                  <span className="text-sm font-medium">
-                    {formatDateTime(slot.date, slot.time, slot.duration)}
-                  </span>
+                <span className="text-sm font-medium">
+                  {formatDateTime(slot.date, slot.time, slot.duration)}
+                </span>
                 </div>
                 <Button
                   variant="ghost"

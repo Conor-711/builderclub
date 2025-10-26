@@ -61,25 +61,25 @@ export function UpcomingMeetingsPanel({
       const [slotsResult, meetingsResult] = await Promise.allSettled([
         // 获取待匹配的时间段 (with 5s timeout)
         supabase
-          .from('user_availability')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('status', 'available')
-          .order('date', { ascending: true })
+        .from('user_availability')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'available')
+        .order('date', { ascending: true })
           .order('time_slot', { ascending: true })
           .abortSignal(AbortSignal.timeout(5000)),
         
         // 获取已确认的会面 (with 8s timeout, more complex query)
         supabase
-          .from('scheduled_meetings')
-          .select(`
-            *,
-            user_a:users!scheduled_meetings_user_a_id_fkey(*),
-            user_b:users!scheduled_meetings_user_b_id_fkey(*)
-          `)
-          .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`)
-          .eq('status', 'scheduled')
-          .order('meeting_date', { ascending: true })
+        .from('scheduled_meetings')
+        .select(`
+          *,
+          user_a:users!scheduled_meetings_user_a_id_fkey(*),
+          user_b:users!scheduled_meetings_user_b_id_fkey(*)
+        `)
+        .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`)
+        .eq('status', 'scheduled')
+        .order('meeting_date', { ascending: true })
           .order('meeting_time', { ascending: true })
           .abortSignal(AbortSignal.timeout(8000))
       ]);
@@ -101,8 +101,8 @@ export function UpcomingMeetingsPanel({
       // Handle scheduled meetings result
       if (meetingsResult.status === 'fulfilled') {
         const { data: meetings, error: meetingsError } = meetingsResult.value;
-        if (meetingsError) {
-          console.error('Error fetching scheduled meetings:', meetingsError);
+      if (meetingsError) {
+        console.error('Error fetching scheduled meetings:', meetingsError);
           setScheduledMeetings([]);
         } else {
           setScheduledMeetings(meetings || []);

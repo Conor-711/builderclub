@@ -49,6 +49,8 @@ const Connections = () => {
   const [demoPendingSlots, setDemoPendingSlots] = useState<DemoSlot[]>([]);
   const [demoMeetings, setDemoMeetings] = useState<DemoMeeting[]>([]);
   const [showMatchDialog, setShowMatchDialog] = useState(false);
+  const [showIntroAnimation, setShowIntroAnimation] = useState(false);
+  const [introPartnerNames, setIntroPartnerNames] = useState<string[]>([]);
   const [matchDialogData, setMatchDialogData] = useState<{
     partners: DemoPartner[];
     date: string;
@@ -169,14 +171,25 @@ const Connections = () => {
                   };
                   setDemoMeetings(prev => [...prev, newDemoMeeting]);
                   
-                  // Trigger match success dialog
-                  setMatchDialogData({
-                    partners: newDemoMeeting.partners,
-                    date: slot.date,
-                    time: slot.time,
-                    meetingId: newDemoMeeting.id
-                  });
-                  setShowMatchDialog(true);
+                  // First show introduction animation
+                  setIntroPartnerNames(newDemoMeeting.partners.map(p => p.name));
+                  setShowIntroAnimation(true);
+                  
+                  // After 1.5 seconds, hide animation and show dialog
+                  setTimeout(() => {
+                    setShowIntroAnimation(false);
+                    
+                    // Wait for fade out animation (0.3s) before showing dialog
+                    setTimeout(() => {
+                      setMatchDialogData({
+                        partners: newDemoMeeting.partners,
+                        date: slot.date,
+                        time: slot.time,
+                        meetingId: newDemoMeeting.id
+                      });
+                      setShowMatchDialog(true);
+                    }, 300);
+                  }, 1500);
                 }, 5000);
               }}
             />
@@ -220,19 +233,130 @@ const Connections = () => {
           </button>
 
           {/* Demo按钮 */}
-          <button
-            onClick={() => setIsDemoMode(!isDemoMode)}
+        <button
+          onClick={() => setIsDemoMode(!isDemoMode)}
             className={`px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
-              isDemoMode
-                ? 'bg-foreground text-background border-foreground shadow-lg'
-                : 'bg-background text-foreground border-border hover:border-foreground hover:shadow-md'
-            }`}
-          >
-            <span className="text-sm font-medium">
-              {isDemoMode ? '✓ Demo Mode' : 'Demo'}
-            </span>
-          </button>
+            isDemoMode
+              ? 'bg-foreground text-background border-foreground shadow-lg'
+              : 'bg-background text-foreground border-border hover:border-foreground hover:shadow-md'
+          }`}
+        >
+          <span className="text-sm font-medium">
+            {isDemoMode ? '✓ Demo Mode' : 'Demo'}
+          </span>
+        </button>
         </div>
+
+        {/* Introduction Animation - appears before dialog */}
+        {showIntroAnimation && (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+            style={{
+              animation: 'fadeInScale 0.5s ease-out forwards'
+            }}
+          >
+            <div className="text-center space-y-6" style={{
+              animation: 'zoomIn 0.5s ease-out forwards'
+            }}>
+              {/* Decorative elements */}
+              <div className="absolute -top-20 -left-20 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+              
+              {/* Main content */}
+              <div className="relative z-10">
+                {/* Sparkle icon */}
+                <div className="flex justify-center mb-8 animate-bounce">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary via-purple-500 to-pink-500 flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                
+                {/* "Introduction:" text */}
+                <div className="mb-4">
+                  <p className="text-2xl md:text-3xl font-light text-white/80 tracking-wider uppercase">
+                    Introduction
+                  </p>
+                </div>
+                
+                {/* Partner names - Large and designed */}
+                <div className="space-y-2">
+                  <h1 
+                    className="text-5xl md:text-7xl font-black bg-gradient-to-r from-primary via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight tracking-tight"
+                    style={{
+                      animation: 'slideUpFade 0.7s ease-out 0.2s forwards',
+                      opacity: 0
+                    }}
+                  >
+                    {introPartnerNames.join(' & ')}
+                  </h1>
+                  
+                  {/* Decorative line */}
+                  <div className="flex justify-center mt-6">
+                    <div className="w-32 h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full animate-pulse" />
+                  </div>
+                </div>
+                
+                {/* Subtitle */}
+                <p 
+                  className="text-lg md:text-xl text-white/60 font-light tracking-wide mt-8"
+                  style={{
+                    animation: 'fadeIn 0.8s ease-out 0.5s forwards',
+                    opacity: 0
+                  }}
+                >
+                  Your BuilderClub Matches
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add keyframe animations */}
+        <style>{`
+          @keyframes fadeInScale {
+            from {
+              opacity: 0;
+              backdrop-filter: blur(0);
+            }
+            to {
+              opacity: 1;
+              backdrop-filter: blur(8px);
+            }
+          }
+          
+          @keyframes zoomIn {
+            from {
+              opacity: 0;
+              transform: scale(0.9);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          @keyframes slideUpFade {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+            }
+            to {
+              opacity: 1;
+            }
+          }
+        `}</style>
 
         {/* Match Success Dialog - Demo模式专用 */}
         <MatchSuccessDialog
