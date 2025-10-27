@@ -1,17 +1,68 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { UID } from 'agora-rtc-sdk-ng';
 import { ParticipantInfoCard, Participant } from '@/components/ParticipantInfoCard';
 import { MatchingReasonsPanel, MatchingReason, Topic } from '@/components/MatchingReasonsPanel';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, ArrowLeft } from 'lucide-react';
+import { VideoPlayer } from '@/components/VideoPlayer';
+import { DevicePermissionCheck } from '@/components/DevicePermissionCheck';
+import { useAgoraRTC } from '@/hooks/useAgoraRTC';
+import { generateChannelName } from '@/lib/agoraConfig';
+import { parseAgoraError, isRecoverableError } from '@/lib/errorHandler';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, ArrowLeft, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const Meeting = () => {
   const navigate = useNavigate();
-  const [activeSpeaker, setActiveSpeaker] = useState<number | null>(null);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
+  const [searchParams] = useSearchParams();
+  
+  // Stabilize channel name and user ID - only compute once on mount
+  const [channelName] = useState(() => 
+    searchParams.get('channel') || generateChannelName()
+  );
+  const [userId] = useState(() => 
+    searchParams.get('userId') || `user_${Date.now()}`
+  );
+  
+  // Agora RTC Hook
+  const {
+    isJoined,
+    isInitialized,
+    localAudioEnabled,
+    localVideoEnabled,
+    remoteUsers,
+    error: rtcError,
+    initialize,
+    joinChannel,
+    leaveChannel,
+    toggleMicrophone,
+    toggleCamera,
+    service,
+  } = useAgoraRTC({
+    onError: (error) => {
+      console.error('❌ RTC Error:', error);
+      toast.error(`会议错误: ${error.message}`);
+    },
+    onRemoteUserJoined: (user) => {
+      console.log('👋 Remote user joined:', user.uid);
+      toast.success(`参与者 ${user.uid} 加入了会议`);
+    },
+    onRemoteUserLeft: (uid) => {
+      console.log('👋 Remote user left:', uid);
+      toast.info(`参与者 ${uid} 离开了会议`);
+    },
+  });
 
-  // 参与者数据
+  // Speaker detection state
+  const [activeSpeaker, setActiveSpeaker] = useState<UID | 'local' | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
+  const [permissionsGranted, setPermissionsGranted] = useState(false);
+  const [permissionsDenied, setPermissionsDenied] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [parsedError, setParsedError] = useState<ReturnType<typeof parseAgoraError> | null>(null);
+
+  // Mock participant data (for UI display)
   const participants: Participant[] = [
     {
       name: 'Amy',
@@ -45,7 +96,7 @@ const Meeting = () => {
     }
   ];
 
-  // 匹配原因数据
+  // Matching reasons data
   const matchingReasons: MatchingReason[] = [
     {
       id: '1',
@@ -74,7 +125,7 @@ const Meeting = () => {
     }
   ];
 
-  // 讨论话题
+  // Meeting topics
   const meetingTopics: Topic[] = [
     {
       id: '1',
@@ -93,145 +144,333 @@ const Meeting = () => {
     }
   ];
 
-  // 随机发光动画效果
+  // Track if we've already joined to prevent duplicate joins
+  const hasJoinedRef = useRef(false);
+
+  // Initialize and join channel after permissions granted
   useEffect(() => {
-    const speakInterval = setInterval(() => {
-      // 停顿期
-      setActiveSpeaker(null);
-      
-      setTimeout(() => {
-        // 随机选择一个参与者
-        const randomIndex = Math.floor(Math.random() * 3);
-        setActiveSpeaker(randomIndex);
+    if (!permissionsGranted || hasJoinedRef.current) return;
+
+    const initAndJoin = async () => {
+      try {
+        setIsJoining(true);
+        setParsedError(null);
         
-        // 持续2-3秒
-        const duration = 2000 + Math.random() * 1000;
-        setTimeout(() => setActiveSpeaker(null), duration);
-      }, 500 + Math.random() * 500);
-    }, 3500);
-    
-    return () => clearInterval(speakInterval);
+        console.log('🎯 Initializing video call...');
+        console.log('📍 Channel:', channelName);
+        console.log('👤 User ID:', userId);
+
+        // Initialize Agora
+        if (!isInitialized) {
+          await initialize();
+        }
+
+        // Join channel (without token for testing)
+        await joinChannel({
+          channelName,
+          userId,
+          // token: undefined, // Will add token generation later
+        });
+
+        hasJoinedRef.current = true;
+        console.log('✅ Successfully joined the meeting!');
+        toast.success('成功加入会议！');
+      } catch (error) {
+        console.error('❌ Failed to join meeting:', error);
+        
+        const parsed = parseAgoraError(error);
+        setParsedError(parsed);
+        
+        toast.error(parsed.userMessage);
+
+        // Auto-retry for recoverable errors (max 3 times)
+        if (isRecoverableError(error) && retryCount < 3) {
+          console.log(`🔄 Auto-retrying... (${retryCount + 1}/3)`);
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+            hasJoinedRef.current = false;
+            setPermissionsGranted(false);
+            setTimeout(() => setPermissionsGranted(true), 100);
+          }, 3000);
+        }
+      } finally {
+        setIsJoining(false);
+      }
+    };
+
+    initAndJoin();
+
+    // Cleanup on unmount
+    return () => {
+      hasJoinedRef.current = false;
+      leaveChannel().catch(err => console.error('Failed to leave channel:', err));
+    };
+  }, [permissionsGranted, channelName, userId, retryCount]); // 移除函数依赖
+
+  // Setup volume indicator for speaker detection
+  useEffect(() => {
+    if (!service) return;
+
+    service.onVolumeIndicator((volumes) => {
+      // Find the loudest speaker
+      let maxVolume = 0;
+      let loudestUid: UID | 'local' | null = null;
+
+      volumes.forEach(({ uid, level }) => {
+        if (level > maxVolume && level > 10) { // Threshold: 10
+          maxVolume = level;
+          loudestUid = uid === 0 ? 'local' : uid;
+        }
+      });
+
+      setActiveSpeaker(loudestUid);
+    });
+  }, [service]);
+
+  // Handle microphone toggle
+  const handleToggleMicrophone = useCallback(async () => {
+    try {
+      await toggleMicrophone();
+      toast.info(localAudioEnabled ? '麦克风已关闭' : '麦克风已开启');
+    } catch (error) {
+      console.error('Failed to toggle microphone:', error);
+    }
+  }, [toggleMicrophone, localAudioEnabled]);
+
+  // Handle camera toggle
+  const handleToggleCamera = useCallback(async () => {
+    try {
+      await toggleCamera();
+      toast.info(localVideoEnabled ? '摄像头已关闭' : '摄像头已开启');
+    } catch (error) {
+      console.error('Failed to toggle camera:', error);
+    }
+  }, [toggleCamera, localVideoEnabled]);
+
+  // Handle leaving the call
+  const handleLeaveCall = useCallback(async () => {
+    try {
+      await leaveChannel();
+      toast.success('已离开会议');
+      navigate('/feedback');
+    } catch (error) {
+      console.error('Failed to leave call:', error);
+      navigate('/feedback');
+    }
+  }, [leaveChannel, navigate]);
+
+  // Handle manual retry
+  const handleRetry = useCallback(() => {
+    setRetryCount(0);
+    setParsedError(null);
+    setPermissionsGranted(false);
+    setPermissionsDenied(false);
+    // Trigger permission check again
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   }, []);
+
+  // Get local video track
+  const localVideoTrack = service?.getLocalVideoTrack();
+  const localAudioTrack = service?.getLocalAudioTrack();
+
+  // Show permission check screen if permissions not granted yet
+  if (!permissionsGranted && !permissionsDenied) {
+    return (
+      <DevicePermissionCheck
+        onPermissionsReady={() => setPermissionsGranted(true)}
+        onPermissionsDenied={() => setPermissionsDenied(true)}
+      />
+    );
+  }
+
+  // Show error screen if permissions denied
+  if (permissionsDenied) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 space-y-4">
+          <div className="text-center space-y-2">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+            <h2 className="text-2xl font-bold text-white">无法加入会议</h2>
+            <p className="text-white/70">需要摄像头和麦克风权限才能继续</p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleRetry} className="flex-1" variant="default">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              重试
+            </Button>
+            <Button onClick={() => navigate('/connections')} className="flex-1" variant="outline">
+              返回
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex flex-col">
-      {/* 主要内容区域 */}
+      {/* Error Alert */}
+      {(rtcError || parsedError) && (
+        <div className="p-4">
+          <Alert variant="destructive" className="bg-red-500/10 border-red-500/50">
+            <AlertCircle className="h-4 w-4" />
+            <div className="flex-1 space-y-2">
+              <div className="font-medium text-sm">
+                {parsedError?.userMessage || rtcError?.message || '发生错误'}
+              </div>
+              {parsedError?.suggestions && parsedError.suggestions.length > 0 && (
+                <ul className="text-xs space-y-1 mt-2 list-disc list-inside text-red-200/90">
+                  {parsedError.suggestions.map((suggestion, index) => (
+                    <li key={index}>{suggestion}</li>
+                  ))}
+                </ul>
+              )}
+              {isRecoverableError(rtcError || parsedError?.originalError) && retryCount < 3 && (
+                <div className="text-xs mt-2 text-red-200/80">
+                  正在自动重试... ({retryCount + 1}/3)
+                </div>
+              )}
+              {retryCount >= 3 && (
+                <Button onClick={handleRetry} size="sm" variant="outline" className="mt-2">
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  手动重试
+                </Button>
+              )}
+            </div>
+          </Alert>
+        </div>
+      )}
+
+      {/* Main content area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* 左侧：视频区域 (70%) */}
+        {/* Left side: Video area (70%) */}
         <div className="w-full lg:w-[70%] flex flex-col items-center justify-center p-6 overflow-y-auto">
           <div className="w-full max-w-6xl space-y-4">
-            {/* 匹配原因模块 */}
+            {/* Matching reasons panel */}
             <MatchingReasonsPanel 
               reasons={matchingReasons} 
               topics={meetingTopics}
               defaultCollapsed={false} 
             />
 
-            {/* 视频网格 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-              {participants.map((participant, index) => (
-                <div
-                  key={index}
-                  className={`relative aspect-[4/3] bg-gray-800 rounded-xl overflow-hidden transition-all duration-300 ${
-                    activeSpeaker === index
-                      ? 'ring-4 ring-primary shadow-2xl shadow-primary/50 scale-105'
-                      : 'ring-2 ring-gray-700'
-                  }`}
-                >
-                  {/* 视频画面（用头像模拟） */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-                    <Avatar className="w-32 h-32 border-4 border-gray-700">
-                      <AvatarImage src={participant.avatar} />
-                      <AvatarFallback className="text-4xl font-bold bg-gray-700">
-                        {participant.name[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
+            {/* Loading state */}
+            {isJoining && (
+              <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                <p className="text-white text-lg">正在加入会议...</p>
+                <p className="text-white/60 text-sm">请允许浏览器访问您的麦克风和摄像头</p>
+              </div>
+            )}
 
-                  {/* 姓名标签 */}
-                  <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-black/70 backdrop-blur-sm rounded-lg">
-                    <span className="text-white text-sm font-semibold">
-                      {participant.name}
-                    </span>
-                  </div>
+            {/* Video grid */}
+            {isJoined && !isJoining && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                {/* Local user video */}
+                <VideoPlayer
+                  videoTrack={localVideoTrack}
+                  audioTrack={localAudioTrack}
+                  userName="You"
+                  userAvatar="/users/user1.jpg"
+                  isLocal={true}
+                  isSpeaking={activeSpeaker === 'local'}
+                  isVideoEnabled={localVideoEnabled}
+                />
 
-                  {/* 说话指示器（可选的音波图标） */}
-                  {activeSpeaker === index && (
-                    <div className="absolute top-4 right-4">
-                      <div className="flex gap-1 items-end">
-                        <div className="w-1 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0ms' }}></div>
-                        <div className="w-1 h-5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '150ms' }}></div>
-                        <div className="w-1 h-4 bg-primary rounded-full animate-pulse" style={{ animationDelay: '300ms' }}></div>
-                      </div>
+                {/* Remote users videos */}
+                {remoteUsers.map((user, index) => (
+                  <VideoPlayer
+                    key={user.uid}
+                    videoTrack={user.videoTrack}
+                    audioTrack={user.audioTrack}
+                    userName={`User ${user.uid}`}
+                    userAvatar={participants[index + 1]?.avatar || '/users/user2.jpg'}
+                    isLocal={false}
+                    isSpeaking={activeSpeaker === user.uid}
+                    isVideoEnabled={user.hasVideo}
+                  />
+                ))}
+
+                {/* Placeholder for empty slots */}
+                {Array.from({ length: Math.max(0, 2 - remoteUsers.length) }).map((_, index) => (
+                  <div
+                    key={`placeholder-${index}`}
+                    className="relative aspect-[4/3] bg-gray-800/50 rounded-xl overflow-hidden border-2 border-dashed border-gray-700 flex items-center justify-center"
+                  >
+                    <div className="text-center">
+                      <p className="text-white/40 text-sm">等待参与者加入...</p>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* 右侧：参与者信息卡片 (30%) */}
+        {/* Right side: Participant info cards (30%) */}
         <div className="hidden lg:block w-[30%] bg-white/10 backdrop-blur-md border-l border-white/10 overflow-y-auto">
           <div className="p-3 space-y-2">
             <h2 className="text-base font-bold text-white mb-2 flex items-center gap-2">
               <div className="w-1 h-4 bg-primary rounded-full"></div>
-              Participants
+              Participants ({1 + remoteUsers.length})
             </h2>
-            {participants.map((participant, index) => (
+            {participants.slice(0, 1 + remoteUsers.length).map((participant, index) => (
               <ParticipantInfoCard key={index} participant={participant} />
             ))}
           </div>
         </div>
       </div>
 
-      {/* 底部工具栏 */}
+      {/* Bottom toolbar */}
       <div className="h-20 bg-black/80 backdrop-blur-md border-t border-gray-800 flex items-center justify-center">
         <div className="flex items-center gap-4">
-          {/* 麦克风按钮 */}
+          {/* Microphone button */}
           <button
-            onClick={() => setIsMuted(!isMuted)}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-              isMuted
+            onClick={handleToggleMicrophone}
+            disabled={!isJoined}
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+              !localAudioEnabled
                 ? 'bg-red-500 hover:bg-red-600'
                 : 'bg-gray-700 hover:bg-gray-600'
             }`}
-            title={isMuted ? 'Unmute' : 'Mute'}
+            title={localAudioEnabled ? 'Mute' : 'Unmute'}
           >
-            {isMuted ? (
+            {!localAudioEnabled ? (
               <MicOff className="w-5 h-5 text-white" />
             ) : (
               <Mic className="w-5 h-5 text-white" />
             )}
           </button>
 
-          {/* 摄像头按钮 */}
+          {/* Camera button */}
           <button
-            onClick={() => setIsVideoOff(!isVideoOff)}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-              isVideoOff
+            onClick={handleToggleCamera}
+            disabled={!isJoined}
+            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+              !localVideoEnabled
                 ? 'bg-red-500 hover:bg-red-600'
                 : 'bg-gray-700 hover:bg-gray-600'
             }`}
-            title={isVideoOff ? 'Turn on camera' : 'Turn off camera'}
+            title={localVideoEnabled ? 'Turn off camera' : 'Turn on camera'}
           >
-            {isVideoOff ? (
+            {!localVideoEnabled ? (
               <VideoOff className="w-5 h-5 text-white" />
             ) : (
               <Video className="w-5 h-5 text-white" />
             )}
           </button>
 
-          {/* 结束通话按钮 */}
+          {/* End call button */}
           <button
-            onClick={() => navigate('/feedback')}
+            onClick={handleLeaveCall}
             className="w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 flex items-center justify-center transition-all duration-200 shadow-lg"
             title="End call"
           >
             <PhoneOff className="w-6 h-6 text-white" />
           </button>
 
-          {/* 返回按钮 */}
+          {/* Back button */}
           <button
             onClick={() => navigate('/connections')}
             className="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center transition-all duration-200"
@@ -241,6 +480,16 @@ const Meeting = () => {
           </button>
         </div>
       </div>
+
+      {/* Connection info (dev only) */}
+      {import.meta.env.DEV && (
+        <div className="fixed bottom-24 right-4 bg-black/80 text-white text-xs p-2 rounded font-mono">
+          <div>Channel: {channelName}</div>
+          <div>User ID: {userId}</div>
+          <div>Status: {isJoined ? '✅ Joined' : '⏳ Connecting...'}</div>
+          <div>Remote Users: {remoteUsers.length}</div>
+        </div>
+      )}
     </div>
   );
 };

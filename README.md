@@ -59,6 +59,40 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Agora RTC SDK (for real-time video calling)
+- Supabase (backend & database)
+
+## 🎥 Video Meeting Feature
+
+This project now includes real-time video meeting functionality powered by Agora RTC SDK.
+
+### Quick Start
+
+1. Make sure you have the Agora App ID configured in `.env.local`:
+```env
+VITE_AGORA_APP_ID=339ba064c645450797f04745521f9e66
+```
+
+2. Start the development server:
+```bash
+npm run dev
+```
+
+3. Test the video meeting:
+   - Open: `http://localhost:5173/meeting?channel=test&userId=user1`
+   - Open another tab: `http://localhost:5173/meeting?channel=test&userId=user2`
+   - Both users will join the same meeting room
+
+### Features
+
+- ✅ Real-time audio/video communication (2-3 participants)
+- ✅ Microphone & camera controls
+- ✅ Speaker detection with visual indicators
+- ✅ Device permission management
+- ✅ Error handling & auto-retry
+- ✅ Responsive design
+
+For detailed documentation, see [AGORA_VIDEO_MEETING_GUIDE.md](./AGORA_VIDEO_MEETING_GUIDE.md)
 
 ## How can I deploy this project?
 
