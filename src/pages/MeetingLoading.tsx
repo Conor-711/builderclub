@@ -3,11 +3,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { QuestionModule } from '@/components/QuestionModule';
+import { submitAnswer } from '@/services/userQuestionService';
+import { useUser } from '@/contexts/UserContext';
 // Images now loaded from public directory
 
 const MeetingLoading = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user } = useUser();
   const meetingType = searchParams.get('type');
   const isProjectMeeting = meetingType === 'project';
   const isBountyMeeting = meetingType === 'bounty';
@@ -17,6 +21,7 @@ const MeetingLoading = () => {
   const [isFlipping, setIsFlipping] = useState(false);
   const [showAds, setShowAds] = useState(false);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const [showQuestion, setShowQuestion] = useState(true);
 
   const words = ['Idea', 'Team', 'Build', 'Distribute'];
   
@@ -39,6 +44,30 @@ const MeetingLoading = () => {
   ];
 
   const participants = (isProjectMeeting || isBountyMeeting) ? projectParticipants : userParticipants;
+
+  // Question for user profiling
+  const question = "你希望通过这次会议达成什么目标？";
+  const questionId = 'meeting-loading-goal'; // Hardcoded for now, will be dynamic later
+
+  // Handle answer submission
+  const handleAnswerSubmit = async (answer: string, inputMethod: 'voice' | 'text') => {
+    console.log('Answer submitted:', { answer, inputMethod });
+    
+    // Save to Supabase if user is logged in
+    if (user?.id) {
+      try {
+        await submitAnswer(user.id, questionId, answer, inputMethod);
+        console.log('✅ Answer saved to database');
+      } catch (error) {
+        console.error('❌ Failed to save answer:', error);
+        // Continue anyway - don't block the user experience
+      }
+    } else {
+      console.log('⚠️ User not logged in, answer not saved');
+    }
+    
+    setShowQuestion(false);
+  };
 
   // 进度条：5秒从0到100
   useEffect(() => {
@@ -169,6 +198,16 @@ const MeetingLoading = () => {
             </span>
           </div>
         </div>
+
+        {/* Question Module */}
+        {showQuestion && (
+          <div className="animate-fade-in">
+            <QuestionModule 
+              question={question}
+              onAnswerSubmit={handleAnswerSubmit}
+            />
+          </div>
+        )}
       </div>
 
       {/* 广告展示区域 - 底部 */}
