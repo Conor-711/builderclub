@@ -110,7 +110,7 @@ const Connections = () => {
 
   return (
     <AppLayout>
-      <div className="p-6 mx-auto space-y-6 max-w-7xl">
+      <div className="p-6 mx-auto space-y-6 max-w-5xl">
         {/* 头部 */}
         <div className="space-y-4">
           {/* <div>
@@ -123,11 +123,10 @@ const Connections = () => {
           {/* 筛选区域 */}
         </div>
 
-        {/* 两栏布局：左侧会面管理，右侧即将到来的会面 */}
-        <div className="lg:grid lg:grid-cols-[70%_30%] lg:gap-6 space-y-6 lg:space-y-0">
-          {/* 左侧：会面管理 */}
-          <div>
-            <TimeMatchingPanel 
+        {/* 单栏布局：时间选择和即将到来的会面垂直排列 */}
+        <div className="space-y-6">
+          {/* 时间选择模块 */}
+          <TimeMatchingPanel 
               userId={userId}
               sameCityFilter={sameCityFilter}
               stageFilter={stageFilter}
@@ -193,13 +192,9 @@ const Connections = () => {
                 }, 5000);
               }}
             />
-          </div>
-
           
-          
-          {/* 右侧：即将到来的会面 */}
-          <div className="lg:sticky lg:top-20 self-start">
-            <UpcomingMeetingsPanel 
+          {/* 即将到来的会面模块 */}
+          <UpcomingMeetingsPanel 
               userId={userId}
               isDemoMode={isDemoMode}
               demoPendingSlots={demoPendingSlots}
@@ -209,7 +204,6 @@ const Connections = () => {
               }}
               key={refreshKey} 
             />
-          </div>
         </div>
 
         {/* 右下角按钮组 */}
@@ -267,27 +261,27 @@ const Connections = () => {
               {/* Main content */}
               <div className="relative z-10">
                 {/* Enhanced Sparkle icon with glow */}
-                <div className="flex justify-center mb-10" style={{
+                <div className="flex justify-center mb-6" style={{
                   animation: 'floatBounce 2s ease-in-out infinite'
                 }}>
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border-2 border-white/30">
-                      <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-2xl border-2 border-white/30">
+                      <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
                     {/* Glow effect */}
-                    <div className="absolute inset-0 rounded-full bg-white/20 blur-xl animate-pulse" />
+                    <div className="absolute inset-0 rounded-full bg-white/20 blur-lg animate-pulse" />
                   </div>
                 </div>
                 
                 {/* "Introduction:" text with enhanced styling */}
-                <div className="mb-6">
+                <div className="mb-3">
                   <p 
-                    className="text-3xl md:text-4xl font-light text-white tracking-[0.3em] uppercase"
+                    className="text-base md:text-lg font-light text-white tracking-[0.15em] uppercase"
                     style={{
                       animation: 'fadeIn 0.6s ease-out forwards',
-                      textShadow: '0 0 30px rgba(255,255,255,0.3), 0 0 60px rgba(255,255,255,0.2)'
+                      textShadow: '0 0 12px rgba(255,255,255,0.2), 0 0 24px rgba(255,255,255,0.1)'
                     }}
                   >
                     Introduction
@@ -295,37 +289,37 @@ const Connections = () => {
                 </div>
                 
                 {/* Partner names - Pure White with enhanced effects */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h1 
-                    className="text-6xl md:text-8xl font-black text-white leading-tight tracking-tight"
+                    className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight"
                     style={{
                       animation: 'slideUpFadeScale 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards',
                       opacity: 0,
-                      textShadow: '0 0 40px rgba(255,255,255,0.4), 0 0 80px rgba(255,255,255,0.2), 0 4px 20px rgba(0,0,0,0.3)'
+                      textShadow: '0 0 30px rgba(255,255,255,0.35), 0 0 60px rgba(255,255,255,0.18), 0 4px 16px rgba(0,0,0,0.3)'
                     }}
                   >
                     {introPartnerNames.join(' & ')}
                   </h1>
                   
                   {/* Enhanced Decorative line */}
-                  <div className="flex justify-center mt-8" style={{
+                  <div className="flex justify-center mt-6" style={{
                     animation: 'expandFade 0.8s ease-out 0.6s forwards',
                     opacity: 0
                   }}>
                     <div className="relative">
-                      <div className="w-48 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent" />
-                      <div className="absolute inset-0 w-48 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent blur-sm" />
+                      <div className="w-32 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent" />
+                      <div className="absolute inset-0 w-32 h-0.5 bg-gradient-to-r from-transparent via-white to-transparent blur-sm" />
                     </div>
                   </div>
                 </div>
                 
                 {/* Subtitle with glow */}
                 <p 
-                  className="text-xl md:text-2xl text-white/90 font-light tracking-wide mt-10"
+                  className="text-base md:text-lg text-white/90 font-light tracking-wide mt-6"
                   style={{
                     animation: 'fadeIn 1s ease-out 0.8s forwards',
                     opacity: 0,
-                    textShadow: '0 0 20px rgba(255,255,255,0.3)'
+                    textShadow: '0 0 15px rgba(255,255,255,0.25)'
                   }}
                 >
                   Your BuilderClub Matches

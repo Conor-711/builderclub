@@ -106,22 +106,10 @@ export function TimeMatchingPanel({
               </span>
             )}
           </h2>
-          <p className="text-muted-foreground">
-            {isDemoMode 
-              ? 'Demo: Your match will be found and you will be notified'
-              : ""
-            }
-          </p>
         </div>
 
         {/* Demo 成功提示 */}
-        {showDemoMessage && isDemoMode && (
-          <Card className="p-4 bg-primary/5 border-primary/20">
-            <p className="text-sm text-foreground">
-              ✓ Your time slots have been saved. In a real scenario, you would receive an email notification when a match is found.
-            </p>
-          </Card>
-        )}
+
 
         {/* 时间选择器 */}
         <TimeSlotPicker

@@ -11,6 +11,8 @@ import { PendingAvailabilityCard } from './PendingAvailabilityCard';
 import { CompactMeetingCard } from './CompactMeetingCard';
 import { toast } from '../hooks/use-toast';
 import type { DemoMeeting, DemoSlot, DemoPartner } from '../pages/Connections';
+import { MatchingNetworkAnimation } from './MatchingNetworkAnimation';
+import { useUser } from '@/contexts/UserContext';
 
 interface UpcomingMeetingsPanelProps {
   userId: string;
@@ -28,9 +30,19 @@ export function UpcomingMeetingsPanel({
   onDeleteDemoPending,
 }: UpcomingMeetingsPanelProps) {
   const navigate = useNavigate();
+  const { userData } = useUser();
   const [pendingSlots, setPendingSlots] = useState<UserAvailability[]>([]);
   const [scheduledMeetings, setScheduledMeetings] = useState<ScheduledMeetingWithUsers[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Mock matching users data (从 public/users 获取)
+  const mockMatchingUsers = [
+    { id: '1', avatar: '/users/user1.jpg', name: 'Mike' },
+    { id: '2', avatar: '/users/user2.jpg', name: 'Amanda' },
+    { id: '3', avatar: '/users/user3.jpg', name: 'Sarah' },
+    { id: '4', avatar: '/users/user4.jpg', name: 'John' },
+    { id: '5', avatar: '/users/user5.jpg', name: 'Emma' },
+  ];
 
   // 格式化日期时间
   const formatMeetingDateTime = (date: string, time: string) => {
@@ -163,6 +175,11 @@ export function UpcomingMeetingsPanel({
     );
   }
 
+  // Check if there are any pending slots
+  const hasPendingSlots = isDemoMode 
+    ? demoPendingSlots.length > 0 
+    : pendingSlots.length > 0;
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold">Upcoming Meetings</h2>
@@ -172,7 +189,7 @@ export function UpcomingMeetingsPanel({
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
           Pending Matches
         </h3>
-        {(isDemoMode ? demoPendingSlots.length === 0 : pendingSlots.length === 0) ? (
+        {!hasPendingSlots ? (
           <Card className="p-4 text-center text-sm text-muted-foreground">
             No pending time slots
           </Card>
@@ -212,6 +229,18 @@ export function UpcomingMeetingsPanel({
                 onDelete={handleDeleteSlot}
               />
             ))}
+
+            {/* AI 匹配网络可视化动画 */}
+            {hasPendingSlots && userData && (
+              <MatchingNetworkAnimation
+                currentUser={{
+                  avatar: userData.avatar_url || '/placeholder.svg',
+                  name: userData.first_name || 'You',
+                }}
+                matchingUsers={mockMatchingUsers}
+                isAnimating={true}
+              />
+            )}
           </>
         )}
       </div>
