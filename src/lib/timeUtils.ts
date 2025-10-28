@@ -112,8 +112,8 @@ export type TimePeriod = 'MORNING' | 'NOON' | 'AFTERNOON' | 'EVENING';
  */
 export const TIME_PERIOD_MAP: Record<TimePeriod, string[]> = {
   MORNING: ['09:00', '11:00'],
-  NOON: ['13:00'],
-  AFTERNOON: ['17:00'],
+  NOON: ['12:00', '13:00'],
+  AFTERNOON: ['17:00','18:00'],
   EVENING: ['19:00', '20:00', '21:00', '22:00'],
 };
 
@@ -131,10 +131,10 @@ export const TIME_PERIOD_LABELS: Record<TimePeriod, string> = {
  * 时间段图标
  */
 export const TIME_PERIOD_ICONS: Record<TimePeriod, string> = {
-  MORNING: '🌅',
-  NOON: '☀️',
-  AFTERNOON: '🌤️',
-  EVENING: '🌙',
+  MORNING: '',
+  NOON: '',
+  AFTERNOON: '',
+  EVENING: '',
 };
 
 /**

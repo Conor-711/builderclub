@@ -6,9 +6,9 @@ const TopBar = () => {
   const navigate = useNavigate();
 
   const rightNavItems = [
-    { label: "IdeaHub", path: "/idea", icon: Lightbulb },
+    // { label: "IdeaHub", path: "/idea", icon: Lightbulb },
     { label: "Team Space", path: "/team-space", icon: Building2 },
-    { label: "UGC Marketplace", path: "/marketplace", icon: Store },
+    // { label: "UGC Marketplace", path: "/marketplace", icon: Store },
     { label: "", path: "/profile", icon: User },
   ];
 
@@ -24,7 +24,7 @@ const TopBar = () => {
         </div>
 
         {/* Center - Meet Button with Glass Effect */}
-        <div className="absolute left-[49%] -translate-x-1/2">
+        <div className="absolute left-[50%] -translate-x-1/2">
           <button
             onClick={() => navigate('/connections')}
             className={`

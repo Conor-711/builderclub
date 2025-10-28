@@ -153,14 +153,6 @@ export function TimeRefinementDialog({
             </div>
           </div>
 
-          {/* 提示信息 */}
-          <div className="mt-6 text-center">
-            <p className="text-xs text-muted-foreground">
-              {!canGoEarlier && !canGoLater && 'This is the only available time in this period'}
-              {canGoEarlier && !canGoLater && 'This is the latest time in this period'}
-              {!canGoEarlier && canGoLater && 'This is the earliest time in this period'}
-            </p>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

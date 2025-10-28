@@ -10,6 +10,7 @@ interface UserContextType {
   isAuthLoading: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithGitHub: () => Promise<void>;
   signOut: () => Promise<void>;
   
   // User data related
@@ -106,6 +107,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Session will be automatically set via onAuthStateChange
     return;
+  };
+
+  const signInWithGitHub = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/login`,
+      },
+    });
+
+    if (error) throw error;
+    
+    // OAuth flow will automatically redirect to GitHub
+    // After authorization, user will be redirected back to the app
+    // onAuthStateChange will handle the session update
   };
 
   const signOut = async () => {
@@ -368,6 +384,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthLoading,
         signUp,
         signIn,
+        signInWithGitHub,
         signOut,
         userId,
         userData,

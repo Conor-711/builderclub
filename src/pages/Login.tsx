@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, Github } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/lib/supabase";
@@ -14,12 +14,13 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isGitHubLoading, setIsGitHubLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [isCheckingSetup, setIsCheckingSetup] = useState(false);
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, signUp, authUser, userData, isAuthLoading } = useUser();
+  const { signIn, signUp, signInWithGitHub, authUser, userData, isAuthLoading } = useUser();
   const { toast } = useToast();
 
   // Redirect if already logged in
@@ -248,6 +249,23 @@ const Login = () => {
     }
   };
 
+  const handleGitHubLogin = async () => {
+    setIsGitHubLoading(true);
+    try {
+      await signInWithGitHub();
+      // OAuth flow will automatically redirect to GitHub
+      // No need to do anything here - the redirect happens automatically
+    } catch (error: any) {
+      console.error('GitHub login error:', error);
+      toast({
+        title: "GitHub login failed",
+        description: error.message || "Please try again",
+        variant: "destructive",
+      });
+      setIsGitHubLoading(false);
+    }
+  };
+
   // Show loading if checking auth or setup status
   if (isAuthLoading || isCheckingSetup) {
     return (
@@ -378,6 +396,36 @@ const Login = () => {
                   </form>
                 </TabsContent>
               </Tabs>
+
+              {/* Divider */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+
+              {/* GitHub Login Button */}
+              <Button
+                variant="outline"
+                className="w-full h-12 gap-2"
+                onClick={handleGitHubLogin}
+                disabled={isGitHubLoading || isLoading}
+              >
+                {isGitHubLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Connecting to GitHub...
+                  </>
+                ) : (
+                  <>
+                    <Github className="w-5 h-5" />
+                    Continue with GitHub
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
